@@ -7,7 +7,7 @@ Locally install all the packages via `npm i`
 To build the project, type in `npm run build`.
 To run the project, type in `npm run dev`.
 
-At the moment, it only contains a basic grid layout and a simple eye tracking logic which (very shortly) displays a popup on focus.
+At the moment, it only contains a basic grid layout and a simple eye tracking logic which (very shortly) displays a popup on focus. Right now the positions are not correct for the focus (a problem with the svg not the logic). Try to look at the armchair.
 
 ## Eye tracking - Webgazer
 
