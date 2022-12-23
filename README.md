@@ -19,6 +19,4 @@ The library does not do the tracking as well as the Tobii Eye tracker so we defi
 
 The Speech input is a Vue Component written in JavaScript. Credits go to TylerPottsDev who's code was used as base for the speech recognition web api.
 
-test to which branch i am pushing
-
 
