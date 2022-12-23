@@ -1,8 +1,8 @@
 <template>
-	<div class="voice col-7">
-			<div class="voice__bar">
-			<button @click="toggleMic"><img :src="voiceWaveImg" id="voice__icon-wave" class="icon" /></button>
-			<div class="transcript" v-text="transcript"></div>
+<div class="speech-input col-7">
+	<div class="speech-input__bar">
+		<button @click="toggleMic"><img :src="voiceWaveImg" id="speech-input__icon-wave" class="icon" /></button>
+		<div class="transcript" v-text="transcript"></div>
 	</div>
 </div>
 </template>
@@ -42,6 +42,7 @@ export default {
 				transcript.value = t;
 			}
 		})
+
 		const checkForCommand = (result) => {
 			const t = result[0].transcript;
 			if (t.includes('stop recording') || 
@@ -58,6 +59,7 @@ export default {
 				setTimeout(() => sr.start(), 100);
 			}
 		}
+
 		const toggleMic = () => {
 			if (isRecording.value) {
 				sr.stop();
@@ -72,12 +74,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.voice {
+.speech-input {
   grid-row: span 1;
   background-color: var(--color-light);
   border-radius: 10px;
 
-  .voice__bar {
+  .speech-input__bar {
     height: 50px;
     margin: auto;
     color: var(--color-secondary);
@@ -88,7 +90,7 @@ export default {
     background-color: var(--color-tertiary);
     margin: 30px 0;
 
-    #voice__icon-wave {
+    #speech-input__icon-wave {
       width: 25px;
       height: 100%;
       vertical-align: middle;

@@ -4,7 +4,7 @@
   <SpeechInput />
   <Instructions />
   <Apartment />
-  <Sidebar />
+  <Visualization />
   <Appliances />
 </div>
 </template>
@@ -13,7 +13,7 @@
 import Instructions from './components/Instructions.vue';
 import VideoFeed from './components/VideoFeed.vue';
 import Appliances from './components/Appliances.vue';
-import Sidebar from './components/Sidebar.vue';
+import Visualization from './components/Visualization.vue';
 import Apartment from './components/Apartment.vue';
 import SpeechInput from './components/SpeechInput.vue';
 
@@ -22,7 +22,7 @@ export default {
     VideoFeed,
     Appliances,
     Instructions,
-    Sidebar,
+    Visualization,
     Apartment,
     SpeechInput
   },

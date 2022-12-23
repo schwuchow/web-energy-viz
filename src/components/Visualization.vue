@@ -1,8 +1,8 @@
 <template>
-<div class="sidebar col-3">
+<div class="visualization col-3">
   <h3>Data Visualization</h3>
-  <div class="sidebar__energy-viz">
-    <svg class="sidebar__energy-viz-svg" width="370" height="400"></svg>
+  <div class="visualization__container">
+    <svg class="visualization__container-svg" width="370" height="400"></svg>
   </div>
 </div>
 </template>
@@ -25,7 +25,7 @@ export default {
         d.timestamp = new Date(d.timestamp).getSeconds();
       });
 
-      var svg = d3.select(".sidebar__energy-viz-svg"),
+      var svg = d3.select(".visualization__container-svg"),
       margin = 100,
       width = parseInt(svg.attr("width")) - margin,
       height = parseInt(svg.attr("height")) - margin;
@@ -85,11 +85,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.sidebar {
+.visualization {
   grid-row: span 5;
   margin-top: 40px;
 
-  .sidebar__energy-viz {
+  .visualization__container {
     background-color: var(--color-light);
     border: 1px solid transparent;
     border-radius: 10px;
@@ -98,7 +98,7 @@ export default {
     position: relative;
   }
   
-  .sidebar__energy-viz-svg {
+  .visualization__container-svg {
     z-index: 5;
   }
 }
