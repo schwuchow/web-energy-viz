@@ -6,8 +6,7 @@
   <div class="voice col-7">
     <div class="voice__bar">
       <span>
-        <img :src="voiceWaveImg" id="voice__icon-wave" class="icon" />
-        Ask me something about your devices energy consumption
+        <speech-input></speech-input>
       </span>
     </div>
   </div>
@@ -58,13 +57,13 @@
 <script lang="ts">
 import { onMounted, ref, VNodeRef, Ref } from 'vue';
 import * as d3 from "d3";
-import voiceWaveImg from './assets/voice_wave.svg';
 import apartmentImg from './assets/apartment.svg';
 import houseImg from './assets/house.svg';
 import refrigeratorData from './datasets/data.tsv';
+import SpeechInput from './components/speechInput.vue';
 
 export default {
-    setup() {
+  setup() {
       const apartment: VNodeRef | null = ref(null);
       const devices = new Map();
       const livingRoomLamp1Focused: Ref<boolean> = ref(false);
@@ -73,7 +72,7 @@ export default {
       let lamps: NodeList | [] = [];
       let table: Node | null = null;
       let sofa: Node | null = null;
-
+      
       onMounted(() => {
         console.log("MOUNTED");
 
@@ -211,6 +210,9 @@ export default {
 
       return { voiceWaveImg, livingRoomLamp1Focused, apartmentImg, houseImg, apartment, tableFocused, sofaFocused };
     },
+    components: {
+    SpeechInput,
+  },
 };
 </script>
 
