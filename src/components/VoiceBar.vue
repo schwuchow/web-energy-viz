@@ -4,6 +4,7 @@
     <span>
       <img :src="voiceWaveImg" id="voice__icon-wave" class="icon" />
       Ask me something about your devices energy consumption
+     <SpeechInput />
     </span>
   </div>
 </div>
@@ -11,8 +12,12 @@
 
 <script lang="ts">
 import voiceWaveImg from '../assets/voice_wave.svg';
+import SpeechInput from './SpeechInput.vue';
 
 export default {
+  components: {
+    SpeechInput
+  },
   setup() {
     return { voiceWaveImg };
   }
