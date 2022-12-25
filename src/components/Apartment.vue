@@ -9,11 +9,15 @@
 <script lang="ts">
 import { onMounted, ref, VNodeRef, Ref } from 'vue';
 import apartmentImg from '../assets/apartment.svg';
+import { useDevicesStore } from '../store';
+import { storeToRefs } from 'pinia';
   
 export default {
   setup() {
+    const store = useDevicesStore();
+    const { devices } = storeToRefs(store);
+    const { deviceIds } = store;
     const apartment: VNodeRef | null = ref(null);
-    const devices = new Map();
     let svgContent: any;
 
     onMounted(() => {
@@ -28,16 +32,14 @@ export default {
       const svgPos = (svg as HTMLElement).getBoundingClientRect();
       svgContent = svg.contentDocument;
 
-      const ids = ["kitchen-freezer", "kitchen-dish-washer", "kitchen-fridge", "bathroom-dryer", "bathroom-washing-machine"];
-
-      ids.forEach(id => {
+      Object.entries(deviceIds).forEach(([_, id]) => {
         let el = svgContent.querySelector(`g[id='${id}']`);
 
         const elPos = (el as HTMLElement).getBoundingClientRect();
         elPos.x += svgPos.x;
         elPos.y += svgPos.y;
 
-        devices.set((el as HTMLElement).id.replace("#", ""), elPos);
+        devices.value.set((el as HTMLElement).id.replace("#", ""), elPos);
       });
 
       console.log(devices);
@@ -58,7 +60,7 @@ export default {
     };
 
     const hasEyeFocus = (xPred: number, yPred: number) => {
-      devices.forEach((device, id) => {
+      devices.value.forEach((device, id) => {
         const focused: Ref<boolean> = ref(false);
         const deviceEl = svgContent.querySelector(`g[id='${id}']`);
 

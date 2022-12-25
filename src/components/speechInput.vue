@@ -10,9 +10,13 @@
 <script lang="js">
 import { ref, onMounted } from 'vue'
 import voiceWaveImg from '../assets/voice_wave.svg';
+import { TimePeriod } from '../types/enums';
+import { useDevicesStore } from '../store';
 
 export default {
   setup() {
+		const store = useDevicesStore();
+		const { deviceIds } = store;
 		const transcript = ref('Ask me something about your devices energy consumption!');
 		const isRecording = ref(false);
 		const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -80,32 +84,25 @@ export default {
 			}
 		};
 
-		// Machine selected
-		// - all machines = 0
-		// - washing machine = 1
-		// - dryer = 2
-		// - dishwasher = 3
-		// - freezer = 4
-		// - refrigerator = 5
 		function checkForDevices(t) {
 			var devicesList = [];
 			if (t.includes("all") || t.includes("all devices") || t.includes("old devices")) {
-				devicesList.push(0);
+				devicesList.push("all");
 			}
 			if (t.includes("washing machine")) {
-					devicesList.push(1);
+					devicesList.push(deviceIds.bathroomWashingMashine);
 			}
 			if (t.includes("dryer")) {
-					devicesList.push(2);
+					devicesList.push(deviceIds.bathroomDryer);
 			}
 			if (t.includes("dishwasher")) {
-					devicesList.push(3);
+					devicesList.push(deviceIds.kitchenDishWasher);
 			}
 			if (t.includes("freezer")) {
-					devicesList.push(4);
+					devicesList.push(deviceIds.kitchenFreezer);
 			}
 			if (t.includes("refrigerator") || t.includes("fridge")) {
-					devicesList.push(5);
+					devicesList.push(deviceIds.kitchenFridge);
 			}
 			
 			if (devicesList.length === 0) {
@@ -115,23 +112,16 @@ export default {
 			return devicesList;
 		}
 
-
-		// Time Periods
-		// -1 = yesterday;
-		// 0 = all time;
-		// 1 = last week;
-		// 2 = last two weeks;
-		// 3 = last month
 		function checkForTimePeriod(t) {
-			var timePeriod = 0;
+			var timePeriod = TimePeriod.ALL_TIME;
 			if (t.includes("yesterday")) {
-				timePeriod = -1;
+				timePeriod = TimePeriod.YESTERDAY;
 			} else if (t.includes("last two weeks")) {
-				timePeriod = 2;
+				timePeriod = TimePeriod.LAST_TWO_WEEEKS;
 			} else if (t.includes("last week")) {
-				timePeriod = 1;
+				timePeriod = TimePeriod.LAST_WEEK;
 			} else if (t.includes("last month")) {
-				timePeriod = 3;
+				timePeriod = TimePeriod.LAST_MONTH;
 			}
 			return timePeriod;
 		}
