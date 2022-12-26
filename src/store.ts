@@ -15,8 +15,8 @@ export const useDevicesStore = defineStore('devices', () => {
     kitchenFridge: "kitchen-fridge",
   };
 
-  const devices = ref(new Map());
+  const devices: Ref<Map<string, DOMRect>> = ref(new Map());
   const visualization: Ref<Visualization> | Ref<null> = ref(null);
 
-  return { deviceIds, devices };
+  return { deviceIds, devices, visualization };
 });

@@ -12,11 +12,13 @@ import { ref, onMounted } from 'vue'
 import voiceWaveImg from '../assets/voice_wave.svg';
 import { TimePeriod } from '../types/enums';
 import { useDevicesStore } from '../store';
+import { storeToRefs } from 'pinia';
 
 export default {
   setup() {
 		const store = useDevicesStore();
 		const { deviceIds } = store;
+		const { visualization } = storeToRefs(store);
 		const transcript = ref('Ask me something about your devices energy consumption!');
 		const isRecording = ref(false);
 		const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -67,7 +69,13 @@ export default {
 					console.log("the MOST usecase - not implemented yet");
 				var timePeriod = checkForTimePeriod(t);
 				var devicesSelected = checkForDevices(t);
-				runVisualisation(timePeriod, devicesSelected);
+
+				const newVisualization = {
+					timePeriod: timePeriod,
+					deviceId: devicesSelected
+				};
+
+				visualization.value = newVisualization;
 				}
 
 					
@@ -86,6 +94,7 @@ export default {
 
 		function checkForDevices(t) {
 			var devicesList = [];
+
 			if (t.includes("all") || t.includes("all devices") || t.includes("old devices")) {
 				devicesList.push("all");
 			}
@@ -114,6 +123,7 @@ export default {
 
 		function checkForTimePeriod(t) {
 			var timePeriod = TimePeriod.ALL_TIME;
+
 			if (t.includes("yesterday")) {
 				timePeriod = TimePeriod.YESTERDAY;
 			} else if (t.includes("last two weeks")) {
@@ -124,11 +134,6 @@ export default {
 				timePeriod = TimePeriod.LAST_MONTH;
 			}
 			return timePeriod;
-		}
-
-		function runVisualisation(time, devices) {
-			console.log("time: " + time + " - selected device:" + devices);
-			alert("time: " + time + " - selected device:" + devices);
 		}
 
 		return { voiceWaveImg, toggleMic, transcript };

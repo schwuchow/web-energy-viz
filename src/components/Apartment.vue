@@ -23,7 +23,7 @@ export default {
     onMounted(() => {
       console.log("MOUNTED");
 
-      addWebGazeListener();
+      // addWebGazeListener();
       setTimeout(() => buildDevicesMap(), 3000);
     })
 
