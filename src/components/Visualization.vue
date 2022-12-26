@@ -11,7 +11,6 @@
 <script lang="ts">
 import * as d3 from "d3";
 // @ts-ignore
-// import refrigeratorData from '../datasets/data.tsv';
 import washingMashineData from '../datasets/data.csv';
 import { onMounted } from 'vue';
 import { useDevicesStore } from '../store';
@@ -28,8 +27,8 @@ export default {
 
     onMounted(() => {
       getCurrentDay();
+      // showHierarchicalBarChart();
       showRadialStackedBarChart();
-      // showBarVisualization();
     });
 
     const getCurrentDay = (): number => {
@@ -37,6 +36,66 @@ export default {
       const dayOfToday = today.getDate();
       console.log("Today's day: ", dayOfToday);
       return dayOfToday;
+    };
+
+    const showHierarchicalBarChart = () => {
+      // set the dimensions and margins of the graph
+      var margin = {top: 10, right: 10, bottom: 110, left: 30},
+          width = 370 - margin.left - margin.right,
+          height = 450 - margin.top - margin.bottom;
+
+      // append the svg object to the body of the page
+      var svg = d3.select(".visualization__container-svg")
+        .append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+          .attr("transform",
+                "translate(" + margin.left + "," + margin.top + ")");
+
+      const data = washingMashineData.slice(0, 32);
+      const values = data.map((d: any) => d.Value);
+      const maxDomain = Math.max(...values);
+
+      const rankedData = data.sort(function(obj1: any, obj2: any) {
+        if (obj1.Value < obj2.Value) return 1;
+        if (obj1.Value > obj2.Value) return -1;
+        return 0;
+      });
+
+      console.log(rankedData);
+
+      // Add X axis
+      var x = d3.scaleLinear()
+        .domain([0, maxDomain])
+        .range([ 0, width]);
+
+      svg.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x))
+        .selectAll("text")
+          .attr("transform", "translate(-10,0)rotate(-45)")
+          .style("text-anchor", "end");
+
+      // Y axis
+      var y = d3.scaleBand()
+        .range([ 0, height ])
+        .domain(rankedData.map(function(d: any) { return d.Day; }))
+        .padding(.1);
+
+      svg.append("g")
+        .call(d3.axisLeft(y));
+
+      //Bars
+      svg.selectAll("rect")
+        .data(rankedData)
+        .enter()
+        .append("rect")
+        .attr("x", x(0) )
+        .attr("y", function(d:any) { return y(d.Day)!; })
+        .attr("width", function(d: any) { return x(d.Value); })
+        .attr("height", y.bandwidth() )
+        .attr("fill", "#A5A9FF")
     };
 
     const showRadialStackedBarChart = () => {
@@ -55,7 +114,7 @@ export default {
         .append("g")
           .attr("transform", "translate(" + width / 2 + "," + ( height / 2) + ")");
 
-    const data = washingMashineData.slice(0, 32);
+      const data = washingMashineData.slice(0, 32);
 
       console.log(data);
 
@@ -132,21 +191,6 @@ export default {
           .style("fill", "#2E0B49")
           .text("Energy Consumption (month)");
 
-
-      // Add the labels
-      // svg.append("g")
-      //     .selectAll("g")
-      //     .data(data)
-      //     .enter()
-      //     .append("g")
-      //       .attr("text-anchor", function(d: any) { return (x(d.Day)! + x.bandwidth() / 2 + Math.PI) % (2 * Math.PI) < Math.PI ? "end" : "start"; })
-      //       .attr("transform", function(d: any) { return "rotate(" + ((x(d.Day)! + x.bandwidth() / 2) * 180 / Math.PI - 90) + ")"+"translate(" + (y(d.Value)!+10) + ",0)"; })
-      //     .append("text")
-      //       .text(function(d: any){return(d.Day)})
-      //       .attr("transform", function(d: any) { return (x(d.Day)! + x.bandwidth() / 2 + Math.PI) % (2 * Math.PI) < Math.PI ? "rotate(180)" : "rotate(0)"; })
-      //       .style("font-size", "11px")
-      //       .attr("alignment-baseline", "middle");
-
       // Add day labels
       const label = svg.append("g")
                         .selectAll("g")
@@ -176,67 +220,22 @@ export default {
           .style("fill", "#2E0B49")
           .attr("transform", "translate(-50, 0)")
           .text(function(d: any) { return "Total: " + total });
+
+
+      // Add the labels
+      // svg.append("g")
+      //     .selectAll("g")
+      //     .data(data)
+      //     .enter()
+      //     .append("g")
+      //       .attr("text-anchor", function(d: any) { return (x(d.Day)! + x.bandwidth() / 2 + Math.PI) % (2 * Math.PI) < Math.PI ? "end" : "start"; })
+      //       .attr("transform", function(d: any) { return "rotate(" + ((x(d.Day)! + x.bandwidth() / 2) * 180 / Math.PI - 90) + ")"+"translate(" + (y(d.Value)!+10) + ",0)"; })
+      //     .append("text")
+      //       .text(function(d: any){return(d.Day)})
+      //       .attr("transform", function(d: any) { return (x(d.Day)! + x.bandwidth() / 2 + Math.PI) % (2 * Math.PI) < Math.PI ? "rotate(180)" : "rotate(0)"; })
+      //       .style("font-size", "11px")
+      //       .attr("alignment-baseline", "middle");
     };
-
-    // const showBarVisualization = () => {
-    //   console.log(refrigeratorData);
-    //   refrigeratorData.forEach((d: any) => {
-    //     d.timestamp = new Date(d.timestamp).getSeconds();
-    //   });
-
-    //   var svg = d3.select(".visualization__container-svg"),
-    //   margin = 100,
-    //   width = parseInt(svg.attr("width")) - margin,
-    //   height = parseInt(svg.attr("height")) - margin;
-
-
-    //   var xScale = d3.scaleBand().range ([0, width]).padding(0.4),
-    //       yScale = d3.scaleLinear().range ([height, 0]);
-
-    //   var g = svg.append("g")
-    //             .attr("transform", "translate(" + 50 + "," + 50 + ")");
-
-    //   xScale.domain(refrigeratorData.map(function(d: any) { return d.timestamp; }));
-    //   yScale.domain([60, d3.max(refrigeratorData as Iterable<any>, function(d: any) { return d.energy; })]);
-
-    //   g.append("g")
-    //     .attr("transform", "translate(0," + height + ")")
-    //     .call(d3.axisBottom(xScale));
-
-    //     g.selectAll(".bar")
-    //     .data(refrigeratorData)
-    //     .enter().append("rect")
-    //     .attr("class", "bar")
-    //     // @ts-ignore
-    //     .attr("x", function(d: any) { return xScale(d.timestamp); })
-    //     .attr("y", function(d: any) { return yScale(d.energy); })
-    //     .attr("width", xScale.bandwidth())
-    //     .attr("height", function(d: any) { return height - yScale(d.energy); })
-    //     .attr("fill", "#A5A9FF");
-
-    //   g.append("g")
-    //     .attr("transform", "translate(0," + height + ")")
-    //     .call(d3.axisBottom(xScale))
-    //     .append("text")
-    //     .attr("y", height - 260)
-    //     .attr("x", width - 100)
-    //     .attr("text-anchor", "end")
-    //     .attr("stroke", "#2E0B49")
-    //     .text("Timestamp");
-
-    //   g.append("g")
-    //     .call(d3.axisLeft(yScale)
-    //     .tickFormat(function(d: any) {
-    //         return d;
-    //     }).ticks(10))
-    //     .append("text")
-    //     .attr("transform", "rotate(-90)")
-    //     .attr("y", 6)
-    //     .attr("dy", "-4.1em")
-    //     .attr("text-anchor", "end")
-    //     .attr("stroke", "#2E0B49")
-    //     .text("Energy");
-    // };
 
     return { visualization };
   }
