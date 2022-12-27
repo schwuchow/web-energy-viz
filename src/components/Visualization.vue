@@ -16,10 +16,6 @@ import { onMounted } from 'vue';
 import { useDevicesStore } from '../store';
 import { storeToRefs } from 'pinia';
 
-// TODO Build Visualization for whole month
-// TODO Build Visualization for last week
-// TODO Build Visualization for yesterday
-
 export default {
   setup() {
     const store = useDevicesStore();
@@ -28,7 +24,8 @@ export default {
     onMounted(() => {
       getCurrentDay();
       // showHierarchicalBarChart();
-      showRadialStackedBarChart();
+      // showRadialStackedBarChart();
+      showScatterPlotChart();
     });
 
     const getCurrentDay = (): number => {
@@ -93,9 +90,18 @@ export default {
         .append("rect")
         .attr("x", x(0) )
         .attr("y", function(d:any) { return y(d.Day)!; })
+        .attr("height", y.bandwidth() )
+        .attr("fill", "#A5A9FF");
+
+
+      // Animation
+      svg.selectAll("rect")
+        .transition()
+        .duration(800)
+        .attr("y", function(d: any) { return y(d.Day)!; })
         .attr("width", function(d: any) { return x(d.Value); })
         .attr("height", y.bandwidth() )
-        .attr("fill", "#A5A9FF")
+        .delay(function(d: any,i){ return(i * 100) });
     };
 
     const showRadialStackedBarChart = () => {
@@ -236,6 +242,67 @@ export default {
       //       .style("font-size", "11px")
       //       .attr("alignment-baseline", "middle");
     };
+
+    const showScatterPlotChart = () => {
+      const margin = {top: 10, right: 30, bottom: 30, left: 60},
+      width = 380 - margin.left - margin.right,
+      height = 400 - margin.top - margin.bottom;
+
+
+      // append the svg object to the body of the page
+      const svg = d3.select(".visualization__container-svg")
+        .append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+          .attr("transform", `translate(${margin.left},${margin.top})`);
+
+      const data = washingMashineData.slice(0, 32);
+      const values = data.map((d: any) => d.Value);
+      const maxDomain = Math.max(...values);
+      const minDomain = Math.min(...values);
+
+      console.log(data);
+
+
+      const x = d3.scaleLinear()
+        .domain([0, 31])
+        .range([ 0, width ]);
+
+      svg.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x));
+
+      // Add Y axis
+      const y = d3.scaleLinear()
+        .domain( [minDomain, maxDomain])
+        .range([ height, 0 ]);
+      svg.append("g")
+        .call(d3.axisLeft(y));
+
+      // Add the line
+      svg.append("path")
+        .datum(data)
+        .attr("fill", "none")
+        .attr("stroke", "#A5A9FF")
+        .attr("stroke-width", 2)
+        .attr("d", d3.line()
+          .x((d: any) => x(d.Day))
+          .y((d: any) => y(d.Value))
+          );
+
+      // Add the points
+      svg.append("g")
+        .selectAll("dot")
+        .data(data)
+        .join("circle")
+          .attr("cx", (d: any) => x(d.Day))
+          .attr("cy", (d: any) => y(d.Value))
+          .attr("r", 4)
+          .attr("fill", "#A5A9FF")
+          .attr("stroke", "#fff")
+          .attr("stroke-width", 1.5)
+      };
 
     return { visualization };
   }
