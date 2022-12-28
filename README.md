@@ -19,6 +19,13 @@ The library does not do the tracking as well as the Tobii Eye tracker so we defi
 
 The Speech input is a Vue Component written in JavaScript. Credits go to TylerPottsDev who's code was used as base for the speech recognition web api.
 
+
+## Mouse Input
+
+The mouse input consists currently of two select inputs to select the device and time frame and a checkbox.
+
+To toggle between the speech and mouse input, set the ref `multimodal` in `App.vue` to `true` for speech and `false` for mouse.
+
 ## Data Visualization
 
 This project uses the `d3.js` library to visualize the data. Three visualizations are currently available:

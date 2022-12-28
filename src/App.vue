@@ -1,7 +1,12 @@
 <template>
 <div class="grid">
   <VideoFeed />
-  <SpeechInput />
+  <template v-if="multimodal">
+    <SpeechInput />
+  </template>
+  <template v-else>
+    <MouseInput />
+  </template>
   <Instructions />
   <Apartment />
   <Visualization />
@@ -15,7 +20,9 @@ import VideoFeed from './components/VideoFeed.vue';
 import Appliances from './components/Appliances.vue';
 import Visualization from './components/Visualization.vue';
 import Apartment from './components/Apartment.vue';
+import MouseInput from './components/MouseInput.vue';
 import SpeechInput from './components/SpeechInput.vue';
+import { ref } from 'vue'
 
 export default {
   components: {
@@ -24,9 +31,13 @@ export default {
     Instructions,
     Visualization,
     Apartment,
-    SpeechInput
+    MouseInput,
+    SpeechInput,
   },
   setup() {
+    const multimodal = ref(false);
+
+    return { multimodal };
   }
 };
 </script>

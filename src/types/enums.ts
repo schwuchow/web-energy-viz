@@ -1,7 +1,8 @@
 export enum TimePeriod {
-  YESTERDAY,
-  LAST_TWO_WEEEKS,
-  LAST_WEEK,
-  LAST_MONTH,
-  ALL_TIME,
+  ALL_TIME = "All time",
+  TODAY = "Today",
+  YESTERDAY = "Yesterday",
+  LAST_TWO_WEEEKS = "Last two weeks",
+  LAST_WEEK = "Last week",
+  LAST_MONTH = "Last month",
 };
