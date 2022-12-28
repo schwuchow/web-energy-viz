@@ -3,7 +3,7 @@ import { ref, Ref } from 'vue';
 
 interface Visualization {
   timePeriod: number,
-  deviceId: string,
+  deviceId: string[],
 }
 
 export const useDevicesStore = defineStore('devices', () => {
