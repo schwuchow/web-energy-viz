@@ -19,6 +19,12 @@ The library does not do the tracking as well as the Tobii Eye tracker so we defi
 
 The Speech input is a Vue Component written in JavaScript. Credits go to TylerPottsDev who's code was used as base for the speech recognition web api.
 
-test to which branch i am pushing
+## Data Visualization
 
+This project uses the `d3.js` library to visualize the data. Three visualizations are currently available:
 
+1. A hierarchical bar chart which displays the data in a descending order (the highest is displayed first).
+
+2. A radial stacked bar chart which currently shows data for 31 days in a circular pattern.
+
+3. A scatter plot which shows the data as a line.
