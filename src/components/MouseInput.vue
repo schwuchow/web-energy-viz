@@ -1,20 +1,26 @@
 <template>
   <div class="mouse-input col-7">
-    <div class="mouse-input__bar">
-      <label class="mouse-input__bar-label">Select device: </label>
+    <div class="mouse-input-row">
+      <label class="mouse-input__row-label">Select device: </label>
       <Multiselect
       v-model="deviceValue"
       :options="deviceOptions"
       placeholder="Freezer, Coffee Machine, ..."
       />
-      <label class="mouse-input__bar-label">Select time frame: </label>
+    </div>
+    <div class="mouse-input-row">
+      <label class="mouse-input__row-label">Select time frame: </label>
       <Multiselect
       v-model="timeValue"
       :options="timeOptions"
       placeholder="Today, Last week, ..."
       />
-      <button class="btn" @click="setVisualization">Show</button>
+      <div class="checkbox-container">
+        <input type="checkbox" id="checkbox" v-model="checked" />
+        <label for="checkbox" class="mouse-input__row-label" >Show Ranking of Devices</label>
+      </div>
     </div>
+    <button class="btn mouse-input-btn" @click="setVisualization">Show</button>
   </div>
 </template>
 
@@ -33,6 +39,7 @@ export default {
     const deviceValue = ref("All devices");
     const deviceOptions = ["All devices", "Refrigerator", "Dryer", "Coffee Machine", "Washing Machine", "Freezer"];
     const timeValue = ref(0);
+    const checked = ref(false);
     let timeOptions = [];
 
     for (const value in TimePeriod) {
@@ -49,7 +56,7 @@ export default {
       visualization.value = newVisualization as any;
     };
 
-    return { deviceValue, timeValue, deviceOptions, timeOptions, setVisualization };
+    return { checked, deviceValue, timeValue, deviceOptions, timeOptions, setVisualization };
   }
 }
 </script>
@@ -61,18 +68,21 @@ export default {
   grid-row: span 1;
   background-color: var(--color-light);
   border-radius: 10px;
+  color: var(--color-primary);
+  background-color: var(--color-tertiary);
+  margin: 30px auto;
+  font-size: 20px;
+  display: flex;
+  width: 100%;
 
-  .mouse-input__bar {
-    height: 70px;
-    margin: auto;
-    color: var(--color-primary);
-    display: flex;
-    align-items: center;
-    padding-left: 50px;
-    background-color: var(--color-tertiary);
-    font-size: 20px;
-    margin: 30px 0;
-    .mouse-input__bar-label {
+  > * {
+    padding: 0 10px;
+  }
+
+  .mouse-input-row {
+    width: 30%;
+
+    .mouse-input__row-label {
       font-weight: bold;
       padding: 0 10px;
     }
@@ -82,7 +92,6 @@ export default {
       border-radius: 10px;
       border-width: 2px;
       color: var(--color-primary);
-      max-width: 30%;
       margin: 0;
 
       &:focus-visible {
@@ -93,6 +102,47 @@ export default {
         background: var(--color-primary);
       }
     }
+
+    .checkbox-container {
+      display: flex;
+      margin-top: 15px;
+    }
+
+    #checkbox {
+      appearance: none;
+      border: 2px solid var(--color-primary) !important;
+      border-radius: 5px;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      position: relative;
+
+      & + label {
+        cursor: pointer;
+      }
+    }
+
+    #checkbox::after {
+      content: "";
+      width: 12px;
+      height: 12px;
+      background-color: var(--color-primary);
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      visibility: hidden;
+    }
+
+    #checkbox:checked::after {
+      visibility: visible;
+    }
+  }
+
+  .mouse-input-btn {
+    width: 20%;
+    height: 50%;
+    align-self: top;
+    margin-top: 23px;
   }
 }
 </style>
