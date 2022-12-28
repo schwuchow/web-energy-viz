@@ -23,7 +23,7 @@ export default {
       console.log("MOUNTED");
 
       // addWebGazeListener();
-      setTimeout(() => buildDevicesMap(), 3000);
+      setTimeout(() => buildDevicesMap(), 1000);
     })
 
     const buildDevicesMap = (): void => {
@@ -32,7 +32,7 @@ export default {
       svgContent.value = svg.contentDocument;
 
       Object.entries(deviceIds).forEach(([_, id]) => {
-        let el = (svgContent.value as HTMLElement).querySelector(`g[id='${id}']`);
+        let el = (svgContent.value! as HTMLElement).querySelector(`g[id='${id}']`);
 
         const elPos = (el as HTMLElement).getBoundingClientRect();
         elPos.x += svgPos.x;
@@ -61,7 +61,7 @@ export default {
     const hasEyeFocus = (xPred: number, yPred: number) => {
       devices.value.forEach((device, id) => {
         const focused: Ref<boolean> = ref(false);
-        const deviceEl: HTMLElement | null = (svgContent.value as HTMLElement).querySelector(`g[id='${id}']`);
+        const deviceEl: HTMLElement | null = (svgContent.value! as HTMLElement).querySelector(`g[id='${id}']`);
 
         focused.value = calcFocus(xPred, yPred, device);
 

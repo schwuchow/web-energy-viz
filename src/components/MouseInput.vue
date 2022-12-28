@@ -25,7 +25,7 @@
 </template>
 
 <script lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import Multiselect from '@vueform/multiselect';
 import { TimePeriod } from '../types/enums';
 import { useDevicesStore } from '../store';
@@ -46,27 +46,34 @@ export default {
         timeOptions.push(TimePeriod[value as keyof typeof TimePeriod]);
     }
 
-    // TODO
-    const setFocusIn = (ev: Event) => {
-      console.log(ev);
-      (ev.target! as HTMLElement).style.filter = "brightness(65%)";
-    };
+    onMounted(() => {
+      console.log("MOUNTED MOUSE");
 
-    const setFocusOut = (ev: Event) => {
-      console.log(ev);
-      (ev.target! as HTMLElement).style.filter = "brightness(100%)";
-    };
+      setTimeout(() => setEventListener(), 2000);
+    });
 
-    if (devices.value && svgContent.value) {
-      devices.value.forEach((device: DOMRect, id: string) => {
-        console.log("Focus");
-        const deviceEl = (svgContent.value as HTMLElement).querySelector(`g[id='${id}']`);
+    const setEventListener = () => {
+      if (devices.value && svgContent.value) {
+        devices.value.forEach((device: DOMRect, id: string) => {
+          const deviceEl = (svgContent.value! as HTMLElement).querySelector(`g[id='${id}']`);
 
-        console.log(deviceEl);
-        if (deviceEl) deviceEl.addEventListener("mouseover", setFocusIn);
-        if (deviceEl) deviceEl.addEventListener("mouseout", setFocusOut);
-      });
+          if (deviceEl) deviceEl.addEventListener("mouseover", setFocus);
+          if (deviceEl) deviceEl.addEventListener("mouseout", setFocus);
+        });
+      };
     }
+
+    const setFocus = (ev: Event) => {
+      let brightness;
+
+      if (ev.type === 'mouseover') {
+        brightness = "brightness(65%)";
+      } else {
+        brightness = "brightness(100%)";
+      }
+
+      (ev.target! as HTMLElement).style.filter = brightness;
+    };
 
     const setVisualization = () => {
       const newVisualization = {
