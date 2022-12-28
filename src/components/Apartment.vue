@@ -15,10 +15,9 @@ import { storeToRefs } from 'pinia';
 export default {
   setup() {
     const store = useDevicesStore();
-    const { devices } = storeToRefs(store);
+    const { devices, svgContent } = storeToRefs(store);
     const { deviceIds } = store;
     const apartment: VNodeRef | null = ref(null);
-    let svgContent: any;
 
     onMounted(() => {
       console.log("MOUNTED");
@@ -30,10 +29,10 @@ export default {
     const buildDevicesMap = (): void => {
       const svg = apartment.value;
       const svgPos = (svg as HTMLElement).getBoundingClientRect();
-      svgContent = svg.contentDocument;
+      svgContent.value = svg.contentDocument;
 
       Object.entries(deviceIds).forEach(([_, id]) => {
-        let el = svgContent.querySelector(`g[id='${id}']`);
+        let el = (svgContent.value as HTMLElement).querySelector(`g[id='${id}']`);
 
         const elPos = (el as HTMLElement).getBoundingClientRect();
         elPos.x += svgPos.x;
@@ -62,16 +61,16 @@ export default {
     const hasEyeFocus = (xPred: number, yPred: number) => {
       devices.value.forEach((device, id) => {
         const focused: Ref<boolean> = ref(false);
-        const deviceEl = svgContent.querySelector(`g[id='${id}']`);
+        const deviceEl: HTMLElement | null = (svgContent.value as HTMLElement).querySelector(`g[id='${id}']`);
 
         focused.value = calcFocus(xPred, yPred, device);
 
         if (focused.value) {
           console.log(`${id} FOCUS`);
           console.log(deviceEl);
-          deviceEl.style.filter = "brightness(65%)";
+          deviceEl!.style.filter = "brightness(65%)";
         } else {
-          deviceEl.style.filter = "brightness(100%)";
+          deviceEl!.style.filter = "brightness(100%)";
       }
       });
     };

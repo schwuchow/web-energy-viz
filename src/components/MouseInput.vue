@@ -35,19 +35,40 @@ export default {
   components: { Multiselect },
   setup() {
     const store = useDevicesStore();
-		const { visualization } = storeToRefs(store);
+		const { visualization, devices, svgContent } = storeToRefs(store);
     const deviceValue = ref("All devices");
     const deviceOptions = ["All devices", "Refrigerator", "Dryer", "Coffee Machine", "Washing Machine", "Freezer"];
     const timeValue = ref(0);
     const checked = ref(false);
-    let timeOptions = [];
+    let timeOptions: TimePeriod[] = [];
 
     for (const value in TimePeriod) {
-      timeOptions.push(TimePeriod[value as keyof typeof TimePeriod]);
+        timeOptions.push(TimePeriod[value as keyof typeof TimePeriod]);
+    }
+
+    // TODO
+    const setFocusIn = (ev: Event) => {
+      console.log(ev);
+      (ev.target! as HTMLElement).style.filter = "brightness(65%)";
+    };
+
+    const setFocusOut = (ev: Event) => {
+      console.log(ev);
+      (ev.target! as HTMLElement).style.filter = "brightness(100%)";
+    };
+
+    if (devices.value && svgContent.value) {
+      devices.value.forEach((device: DOMRect, id: string) => {
+        console.log("Focus");
+        const deviceEl = (svgContent.value as HTMLElement).querySelector(`g[id='${id}']`);
+
+        console.log(deviceEl);
+        if (deviceEl) deviceEl.addEventListener("mouseover", setFocusIn);
+        if (deviceEl) deviceEl.addEventListener("mouseout", setFocusOut);
+      });
     }
 
     const setVisualization = () => {
-
       const newVisualization = {
 					timePeriod: timeValue.value,
 					deviceId: deviceValue.value,
@@ -140,7 +161,7 @@ export default {
 
   .mouse-input-btn {
     width: 20%;
-    height: 50%;
+    height: 40%;
     align-self: top;
     margin-top: 23px;
   }
