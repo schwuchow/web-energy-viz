@@ -72,7 +72,8 @@ export default {
 
 				const newVisualization = {
 					timePeriod: timePeriod,
-					deviceId: devicesSelected
+					deviceIds: devicesSelected,
+					ranking: false,
 				};
 
 				visualization.value = newVisualization;

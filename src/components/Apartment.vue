@@ -16,7 +16,7 @@ export default {
   setup() {
     const store = useDevicesStore();
     const { devices, svgContent } = storeToRefs(store);
-    const { deviceIds } = store;
+    const { deviceIds, deviceNames } = store;
     const apartment: VNodeRef | null = ref(null);
 
     onMounted(() => {
@@ -31,14 +31,19 @@ export default {
       const svgPos = (svg as HTMLElement).getBoundingClientRect();
       svgContent.value = svg.contentDocument;
 
-      Object.entries(deviceIds).forEach(([_, id]) => {
+      Object.entries(deviceIds).forEach(([key, id]) => {
         let el = (svgContent.value! as HTMLElement).querySelector(`g[id='${id}']`);
 
         const elPos = (el as HTMLElement).getBoundingClientRect();
         elPos.x += svgPos.x;
         elPos.y += svgPos.y;
 
-        devices.value.set((el as HTMLElement).id.replace("#", ""), elPos);
+        const newDevice = {
+          position: elPos,
+          name: deviceNames[key],
+        }
+
+        devices.value.set((el as HTMLElement).id.replace("#", ""), newDevice);
       });
 
       console.log(devices);

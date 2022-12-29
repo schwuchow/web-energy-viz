@@ -9,10 +9,11 @@
 </template>
   
 <script lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, watch } from 'vue';
 import { useDevicesStore } from '../store';
 import { storeToRefs } from 'pinia';
 import { showHierarchicalBarChart, showRadialBarChart, showScatterPlotChart  } from '../visualizations';
+import { Visualization } from '../types/interfaces';
 
 export default {
   setup() {

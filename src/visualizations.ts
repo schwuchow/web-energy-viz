@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 // @ts-ignore
-import washingMashineData from './datasets/data.csv';
+import washingMashineData from './datasets/data_old.csv';
 
 export const showHierarchicalBarChart = () => {
   // set the dimensions and margins of the graph
