@@ -29,10 +29,12 @@ export const useDevicesStore = defineStore('devices', () => {
     kitchenCoffeeMachine2: "Coffee Machine 2",
   }
 
+  const multimodal: Ref<boolean> = ref(false);
+
   const svgContent: Ref<HTMLElement & SVGElement> | Ref<null> = ref(null);
 
   const devices: Ref<Map<string, Device>> = ref(new Map());
   const visualization: Ref<Visualization> | Ref<null> = ref(null);
 
-  return { deviceIds, deviceNames, devices, visualization, svgContent };
+  return { deviceIds, deviceNames, devices, visualization, svgContent, multimodal };
 });

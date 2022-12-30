@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts">
-import { ref, onMounted, Ref, watch, computed, ComputedRef } from 'vue';
+import { ref, onMounted, Ref, watch } from 'vue';
 import Multiselect from '@vueform/multiselect';
 import { TimePeriod } from '../types/enums';
 import { useDevicesStore } from '../store';

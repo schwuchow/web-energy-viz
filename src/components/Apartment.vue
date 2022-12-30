@@ -96,11 +96,12 @@ export default {
   position: relative;
   background-color: var(--color-light);
   border-radius: 10px;
+  padding-top: 15px;
 
   .apartment__img-container {
     position: absolute;
-    width: 100%;
-    height: 100%;
+    width: 95%;
+    height: 95%;
   }
 
   .apartment__img {

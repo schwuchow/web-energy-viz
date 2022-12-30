@@ -1,6 +1,6 @@
 <template>
 <div class="visualization col-3">
-  <h3>Data Visualization</h3>
+  <h2>Data Visualization</h2>
   <div class="visualization__container">
     <svg class="visualization__container-svg" width="370" height="400"></svg>
     {{ visualization }}
@@ -123,7 +123,7 @@ export default {
 
 <style lang="scss" scoped>
 .visualization {
-  grid-row: span 5;
+  grid-row: span 6;
   margin-top: 40px;
 
   .visualization__container {
