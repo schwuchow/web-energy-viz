@@ -1,10 +1,10 @@
 import * as d3 from "d3";
-// @ts-ignore
-import washingMashineData from './datasets/data_old.csv';
 
-export const showHierarchicalBarChart = () => {
+export const showHierarchicalBarChart = (data: any) => {
+  console.log(data);
+
   // set the dimensions and margins of the graph
-  var margin = {top: 10, right: 10, bottom: 110, left: 30},
+  var margin = {top: 10, right: 10, bottom: 110, left: 150},
       width = 370 - margin.left - margin.right,
       height = 450 - margin.top - margin.bottom;
 
@@ -17,13 +17,12 @@ export const showHierarchicalBarChart = () => {
       .attr("transform",
             "translate(" + margin.left + "," + margin.top + ")");
 
-  const data = washingMashineData.slice(0, 32);
-  const values = data.map((d: any) => d.Value);
+  const values = data.map((d: any) => d.sum);
   const maxDomain = Math.max(...values);
 
   const rankedData = data.sort(function(obj1: any, obj2: any) {
-    if (obj1.Value < obj2.Value) return 1;
-    if (obj1.Value > obj2.Value) return -1;
+    if (obj1.sum < obj2.sum) return 1;
+    if (obj1.sum > obj2.sum) return -1;
     return 0;
   });
 
@@ -44,7 +43,7 @@ export const showHierarchicalBarChart = () => {
   // Y axis
   var y = d3.scaleBand()
     .range([ 0, height ])
-    .domain(rankedData.map(function(d: any) { return d.Day; }))
+    .domain(rankedData.map(function(d: any) { return d.id; }))
     .padding(.1);
 
   svg.append("g")
@@ -56,7 +55,7 @@ export const showHierarchicalBarChart = () => {
     .enter()
     .append("rect")
     .attr("x", x(0) )
-    .attr("y", function(d:any) { return y(d.Day)!; })
+    .attr("y", function(d:any) { return y(d.id)!; })
     .attr("height", y.bandwidth() )
     .attr("fill", "#A5A9FF");
 
@@ -65,13 +64,15 @@ export const showHierarchicalBarChart = () => {
   svg.selectAll("rect")
     .transition()
     .duration(800)
-    .attr("y", function(d: any) { return y(d.Day)!; })
-    .attr("width", function(d: any) { return x(d.Value); })
+    .attr("y", function(d: any) { return y(d.id)!; })
+    .attr("width", function(d: any) { return x(d.sum); })
     .attr("height", y.bandwidth() )
     .delay(function(d: any,i){ return(i * 100) });
 };
 
-export const showRadialBarChart = () => {
+export const showRadialBarChart = (data: any, deviceId: string) => {
+  console.log(data);
+
   // set the dimensions and margins of the graph
   const margin = {top: 10, right: 10, bottom: 10, left: 10},
       width = 370 - margin.left - margin.right,
@@ -86,10 +87,6 @@ export const showRadialBarChart = () => {
       .attr("height", height + margin.top + margin.bottom)
     .append("g")
       .attr("transform", "translate(" + width / 2 + "," + ( height / 2) + ")");
-
-  const data = washingMashineData.slice(0, 32);
-
-  console.log(data);
 
   // X scale
   const x = d3.scaleBand()
@@ -210,11 +207,12 @@ export const showRadialBarChart = () => {
   //       .attr("alignment-baseline", "middle");
 };
 
-export const showScatterPlotChart = () => {
+export const showScatterPlotChart = (data: any) => {
+  console.log(data);
+
   const margin = {top: 10, right: 30, bottom: 30, left: 60},
   width = 380 - margin.left - margin.right,
   height = 400 - margin.top - margin.bottom;
-
 
   // append the svg object to the body of the page
   const svg = d3.select(".visualization__container-svg")
@@ -224,16 +222,12 @@ export const showScatterPlotChart = () => {
     .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-  const data = washingMashineData.slice(0, 32);
   const values = data.map((d: any) => d.Value);
   const maxDomain = Math.max(...values);
   const minDomain = Math.min(...values);
 
-  console.log(data);
-
-
   const x = d3.scaleLinear()
-    .domain([0, 31])
+    .domain([0, data.length])
     .range([ 0, width ]);
 
   svg.append("g")
@@ -256,28 +250,20 @@ export const showScatterPlotChart = () => {
     .attr("d", d3.line()
       .x((d: any) => x(d.Day))
       .y((d: any) => y(d.Value))
-      );
+    );
 
   // Add the points
   svg.append("g")
     .selectAll("dot")
     .data(data)
     .join("circle")
+      .transition()
+      .duration(300)
       .attr("cx", (d: any) => x(d.Day))
       .attr("cy", (d: any) => y(d.Value))
       .attr("r", 4)
       .attr("fill", "#A5A9FF")
       .attr("stroke", "#fff")
-      .attr("stroke-width", 1.5);
-
-  // Animation
-  // svg.selectAll("path")
-  //   .transition()
-  //   .duration(300)
-  //   .attr("y", function(d: any) { return y(d.Day)!; })
-  //   // .attr("d", d3.line()
-  //   //   .x((d: any) => x(d.Day))
-  //   //   .y((d: any) => y(d.Value))
-  //   // )
-  //   .delay(function(d: any,i){ return(i * 50) });
+      .attr("stroke-width", 1.5)
+      .delay(function(d: any, i){ return (i * 50) });
   };

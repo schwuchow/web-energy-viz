@@ -1,6 +1,8 @@
+import { TimePeriod } from './types/enums';
+
 export interface Visualization {
   deviceIds: string[],
-  timePeriod: number,
+  timePeriod: TimePeriod,
   ranking: boolean,
 }
 
