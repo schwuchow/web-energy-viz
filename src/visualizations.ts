@@ -3,6 +3,8 @@ import * as d3 from "d3";
 export const showHierarchicalBarChart = (data: any) => {
   console.log(data);
 
+  resetVisualization();
+
   // set the dimensions and margins of the graph
   var margin = {top: 10, right: 10, bottom: 110, left: 150},
       width = 370 - margin.left - margin.right,
@@ -72,6 +74,8 @@ export const showHierarchicalBarChart = (data: any) => {
 
 export const showRadialBarChart = (data: any, deviceId: string) => {
   console.log(data);
+
+  resetVisualization();
 
   // set the dimensions and margins of the graph
   const margin = {top: 10, right: 10, bottom: 10, left: 10},
@@ -210,6 +214,8 @@ export const showRadialBarChart = (data: any, deviceId: string) => {
 export const showScatterPlotChart = (data: any) => {
   console.log(data);
 
+  resetVisualization();
+
   const margin = {top: 10, right: 30, bottom: 30, left: 60},
   width = 380 - margin.left - margin.right,
   height = 400 - margin.top - margin.bottom;
@@ -266,4 +272,8 @@ export const showScatterPlotChart = (data: any) => {
       .attr("stroke", "#fff")
       .attr("stroke-width", 1.5)
       .delay(function(d: any, i){ return (i * 50) });
+  };
+
+  const resetVisualization = () => {
+    d3.select(".visualization__container-svg").html("");
   };

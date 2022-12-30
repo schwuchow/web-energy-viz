@@ -39,25 +39,15 @@ export default {
     })
 
     const setVisualization = (visualization: Visualization) => {
-      if (!visualization.ranking && visualization.deviceIds.length === 1 && visualization.timePeriod === TimePeriod.LAST_MONTH) {
-        const deviceId = visualization.deviceIds[0];
-        var data = dataset.map((d: any) => ({ Day: d.Day, Value: d[deviceId] }));
-        showRadialBarChart(data, deviceId);
-      }
+      const rules = {
+        hasRankingOfMultipleDevices: visualization.ranking && visualization.deviceIds.length > 1,
+        hasOneDeviceAndOneMonthPeriod: !visualization.ranking && visualization.deviceIds.length === 1 && 
+          visualization.timePeriod === TimePeriod.LAST_MONTH,
+        hasShortTimePeriod: !visualization.ranking && visualization.timePeriod !== TimePeriod.LAST_MONTH,
+      };
 
-      if (!visualization.ranking && visualization.timePeriod !== TimePeriod.LAST_MONTH) {
-        const deviceId = visualization.deviceIds[0];
-        // const data = newData.map((d: any) => ({ Day: d.Day, Value: d[deviceId1] }));
-        var data = dataset.filter((d: any, index: number) => {
-          if (index < 7) return d;
-        }).map((d: any) => {
-          return ({ Day: d.Day, Value: d[deviceId] });
-        });
-        showScatterPlotChart(data);
-      }
-
-      if (visualization.ranking && visualization.deviceIds.length > 1) {
-        var data = [];
+      if (rules.hasRankingOfMultipleDevices) {
+        var data: any = [];
 
         visualization.deviceIds.forEach(id => {
           const sum = calcSumOfConsumption(id);
@@ -65,6 +55,24 @@ export default {
         })
 
         showHierarchicalBarChart(data);
+
+      } else if (rules.hasOneDeviceAndOneMonthPeriod) {
+        const deviceId = visualization.deviceIds[0];
+        var data = dataset.map((d: any) => ({ Day: d.Day, Value: d[deviceId] }));
+
+        showRadialBarChart(data, deviceId);
+
+      } else if (rules.hasShortTimePeriod) {
+        const deviceId = visualization.deviceIds[0];
+        const time = timeFrame(visualization.timePeriod);
+        // const data = newData.map((d: any) => ({ Day: d.Day, Value: d[deviceId1] }));
+        var data = dataset.filter((d: any, index: number) => {
+          if (index < time) return d;
+        }).map((d: any) => {
+          return ({ Day: d.Day, Value: d[deviceId] });
+        });
+
+        showScatterPlotChart(data);
       }
     };
 
@@ -77,6 +85,35 @@ export default {
       );
 
       return sum;
+    };
+
+    const timeFrame = (timePeriod: TimePeriod) => {
+      const today = getCurrentDay();
+
+      switch(timePeriod) {
+        case TimePeriod.TODAY:
+          return today;
+        case TimePeriod.YESTERDAY:
+          if (today === 1) return 31;
+          else return today - 1;
+        case TimePeriod.LAST_WEEK:
+          if (today > 7) return today - 7;
+          else {
+            let daysLeft = 7;
+            let dayOfToday = today;
+            while (dayOfToday > 0 ) {
+              dayOfToday -= 1;
+              daysLeft -= 1;
+            }
+            console.log(daysLeft);
+            return 31 - daysLeft;
+          }
+        case TimePeriod.LAST_MONTH:
+          return 31;
+        case TimePeriod.ALL_TIME:
+          return today;
+        default: return today;
+      };
     };
 
     return { visualization };
