@@ -21,7 +21,7 @@ import dataset from '../datasets/data.csv';
 export default {
   setup() {
     const store = useDevicesStore();
-		const { visualization } = storeToRefs(store);
+		const { devices, visualization } = storeToRefs(store);
 
     onMounted(() => {
       getCurrentDay();
@@ -50,8 +50,9 @@ export default {
         var data: any = [];
 
         visualization.deviceIds.forEach(id => {
+          const name = devices.value.get(id)?.name;
           const sum = calcSumOfConsumption(id);
-          data.push({id: id, sum: sum});
+          data.push({ sum, name });
         })
 
         showHierarchicalBarChart(data);

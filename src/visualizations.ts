@@ -6,7 +6,7 @@ export const showHierarchicalBarChart = (data: any) => {
   resetVisualization();
 
   // set the dimensions and margins of the graph
-  var margin = {top: 10, right: 10, bottom: 110, left: 150},
+  var margin = {top: 10, right: 10, bottom: 110, left: 100},
       width = 370 - margin.left - margin.right,
       height = 450 - margin.top - margin.bottom;
 
@@ -45,7 +45,7 @@ export const showHierarchicalBarChart = (data: any) => {
   // Y axis
   var y = d3.scaleBand()
     .range([ 0, height ])
-    .domain(rankedData.map(function(d: any) { return d.id; }))
+    .domain(rankedData.map(function(d: any) { return d.name; }))
     .padding(.1);
 
   svg.append("g")
@@ -57,7 +57,7 @@ export const showHierarchicalBarChart = (data: any) => {
     .enter()
     .append("rect")
     .attr("x", x(0) )
-    .attr("y", function(d:any) { return y(d.id)!; })
+    .attr("y", function(d:any) { return y(d.name)!; })
     .attr("height", y.bandwidth() )
     .attr("fill", "#A5A9FF");
 
@@ -66,7 +66,7 @@ export const showHierarchicalBarChart = (data: any) => {
   svg.selectAll("rect")
     .transition()
     .duration(800)
-    .attr("y", function(d: any) { return y(d.id)!; })
+    .attr("y", function(d: any) { return y(d.name)!; })
     .attr("width", function(d: any) { return x(d.sum); })
     .attr("height", y.bandwidth() )
     .delay(function(d: any,i){ return(i * 100) });

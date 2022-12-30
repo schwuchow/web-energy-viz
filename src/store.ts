@@ -34,7 +34,8 @@ export const useDevicesStore = defineStore('devices', () => {
   const svgContent: Ref<HTMLElement & SVGElement> | Ref<null> = ref(null);
 
   const devices: Ref<Map<string, Device>> = ref(new Map());
+  const deviceValue: Ref<string[]> = ref([]);
   const visualization: Ref<Visualization> | Ref<null> = ref(null);
 
-  return { deviceIds, deviceNames, devices, visualization, svgContent, multimodal };
+  return { deviceIds, deviceValue, deviceNames, devices, visualization, svgContent, multimodal };
 });

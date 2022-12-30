@@ -37,8 +37,7 @@ export default {
   components: { Multiselect },
   setup() {
     const store = useDevicesStore();
-		const { visualization, devices, svgContent } = storeToRefs(store);
-    const deviceValue: Ref<string[]> = ref(["All devices"]);
+		const { visualization, devices, svgContent, deviceValue } = storeToRefs(store);
     const timeValue = ref(0);
     const checked = ref(false);
     let timeOptions: TimePeriod[] = [];
@@ -162,6 +161,7 @@ export default {
 
       & + label {
         cursor: pointer;
+        user-select: none;
       }
     }
 
