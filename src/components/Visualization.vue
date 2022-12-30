@@ -64,16 +64,21 @@ export default {
         showRadialBarChart(data, deviceId);
 
       } else if (rules.hasShortTimePeriod) {
-        const deviceId = visualization.deviceIds[0];
+        const deviceIds = visualization.deviceIds;
         const time = timeFrame(visualization.timePeriod);
-        // const data = newData.map((d: any) => ({ Day: d.Day, Value: d[deviceId1] }));
-        var data = dataset.filter((d: any, index: number) => {
-          if (index < time) return d;
-        }).map((d: any) => {
-          return ({ Day: d.Day, Value: d[deviceId] });
+
+        var data: any = deviceIds.map((id: any) => {
+            const name = devices.value.get(id)?.name;
+
+            return {
+              name: name,
+              values: dataset.filter((d: any, index: number) => {
+                if (index < time) return d;
+              }).map((d: any) => ({ Day: d.Day, Value: d[id] }))
+            };
         });
 
-        showScatterPlotChart(data);
+        showScatterPlotChart(data, deviceIds);
       }
     };
 

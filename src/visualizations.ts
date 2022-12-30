@@ -119,7 +119,7 @@ export const showRadialBarChart = (data: any, deviceId: string) => {
     .data(data)
     .enter()
     .append("path")
-      .attr("fill", "#A5A9FF")
+    .attr("fill", "#A5A9FF")
 
   // Animation
   svg.selectAll("path")
@@ -211,12 +211,12 @@ export const showRadialBarChart = (data: any, deviceId: string) => {
   //       .attr("alignment-baseline", "middle");
 };
 
-export const showScatterPlotChart = (data: any) => {
+export const showScatterPlotChart = (data: any, deviceIds: string[]) => {
   console.log(data);
 
   resetVisualization();
 
-  const margin = {top: 10, right: 30, bottom: 30, left: 60},
+  const margin = {top: 10, right: 110, bottom: 30, left: 60},
   width = 380 - margin.left - margin.right,
   height = 400 - margin.top - margin.bottom;
 
@@ -228,12 +228,17 @@ export const showScatterPlotChart = (data: any) => {
     .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-  const values = data.map((d: any) => d.Value);
-  const maxDomain = Math.max(...values);
-  const minDomain = Math.min(...values);
+  const values = data.map((d: any) => d.values.map(({Day, Value}: any) => +Value));
+  const flattenValues = values.flat();
+  const maxDomain = Math.max(...flattenValues);
+  const minDomain = Math.min(...flattenValues);
+
+  const colors: any = d3.scaleOrdinal()
+      .domain(deviceIds)
+      .range(d3.schemeSet2);
 
   const x = d3.scaleLinear()
-    .domain([0, data.length])
+    .domain([0, values[0].length])
     .range([ 0, width ]);
 
   svg.append("g")
@@ -247,33 +252,57 @@ export const showScatterPlotChart = (data: any) => {
   svg.append("g")
     .call(d3.axisLeft(y));
 
-  // Add the line
-  svg.append("path")
-    .datum(data)
-    .attr("fill", "none")
-    .attr("stroke", "#A5A9FF")
-    .attr("stroke-width", 2)
-    .attr("d", d3.line()
+  // Add the lines
+  const line: any = d3.line()
       .x((d: any) => x(d.Day))
       .y((d: any) => y(d.Value))
-    );
+
+  svg.selectAll("myLines")
+    .data(data)
+    .enter()
+    .append("path")
+      .attr("d", function(d: any){ return line(d.values) } )
+      .attr("stroke", function(d: any){ return colors(d.name) })
+      .style("stroke-width", 2)
+      .style("fill", "none")
 
   // Add the points
-  svg.append("g")
-    .selectAll("dot")
-    .data(data)
-    .join("circle")
-      .transition()
-      .duration(300)
-      .attr("cx", (d: any) => x(d.Day))
-      .attr("cy", (d: any) => y(d.Value))
-      .attr("r", 4)
-      .attr("fill", "#A5A9FF")
-      .attr("stroke", "#fff")
-      .attr("stroke-width", 1.5)
-      .delay(function(d: any, i){ return (i * 50) });
-  };
+  svg.selectAll("myDots")
+  .data(data)
+  .enter()
+    .append('g')
+    .style("fill", function(d: any){ return colors(d.name) })
+  // Second we need to enter in the 'values' part of this group
+  .selectAll("myPoints")
+  .data(function(d: any){ return d.values })
+  .enter()
+  .append("circle")
+    .transition()
+    .duration(300)
+    .attr("cx", function(d: any) { return x(d.Day) } )
+    .attr("cy", function(d: any) { return y(d.Value) } )
+    .attr("r", 4)
+    .attr("stroke", "white")
+    .attr("stroke-width", 1.5)
+    .delay(function(d: any, i){ return (i * 50) });
 
-  const resetVisualization = () => {
-    d3.select(".visualization__container-svg").html("");
-  };
+  // Add a legend at the end of each line
+  svg
+    .selectAll("myLabels")
+    .data(data)
+    .enter()
+      .append('g')
+      .append("text")
+        // keep only the last value of each time series
+        .datum(function(d: any) { return {name: d.name, value: d.values[d.values.length - 1]}; })
+        // Put the text at the position of the last point
+        .attr("transform", function(d) { return "translate(" + x(d.value.Day) + "," + y(d.value.Value) + ")"; })
+        .attr("x", 12) // shift the text a bit more right
+        .text(function(d) { return d.name; })
+        .style("fill", function(d){ return colors(d.name) })
+        .style("font-size", 10)
+};
+
+const resetVisualization = () => {
+  d3.select(".visualization__container-svg").html("");
+};
