@@ -11,7 +11,7 @@
       <div>2. Select the <b>time frame</b>.</div>
       <div>3. Decide if a <b>ranking</b> should be shown. (If yes, the energy consumption is summed up for the selected time frame.)</div>
       <div>Appliances:</div>
-      <div>Click on a room to select the devices of a room</div>
+      <div>1. Click on a room to select the devices of a room</div>
     </template>
   </div>
 </div>

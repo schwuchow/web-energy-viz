@@ -36,7 +36,7 @@ export default {
 
     watch(visualization, (value) => {
       if (value !== null) setVisualization(value);
-    })
+    });
 
     const setVisualization = (visualization: Visualization) => {
       const rules = {

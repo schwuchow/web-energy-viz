@@ -58,8 +58,6 @@ export default {
     setSelectOptions();
 
     watch(devices.value, (value) => {
-      deviceOptions.value.push("All devices");
-
       value.forEach((device: Device, id: string) => {
         deviceOptions.value.push({ value: id, label: device.name });
       });

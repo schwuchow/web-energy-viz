@@ -7,7 +7,7 @@
 </template>
   
 <script lang="ts">
-import { onMounted, ref, VNodeRef, Ref } from 'vue';
+import { onMounted, ref, VNodeRef, Ref, watch } from 'vue';
 import apartmentImg from '../assets/apartment.svg';
 import { useDevicesStore } from '../store';
 import { storeToRefs } from 'pinia';
@@ -15,7 +15,7 @@ import { storeToRefs } from 'pinia';
 export default {
   setup() {
     const store = useDevicesStore();
-    const { devices, svgContent } = storeToRefs(store);
+    const { devices, svgContent, deviceValue } = storeToRefs(store);
     const { deviceIds, deviceNames } = store;
     const apartment: VNodeRef | null = ref(null);
 
@@ -47,6 +47,17 @@ export default {
       });
 
       console.log(devices);
+    };
+
+    watch(deviceValue, (value) => {
+      if (value !== null && value.length > 0) setSelectedDevices(value);
+    });
+
+    const setSelectedDevices = (value: string[]) => {
+      value.forEach((id: string) => {
+        const deviceEl: HTMLElement | null = (svgContent.value! as HTMLElement).querySelector(`g[id='${id}']`);
+        deviceEl!.style.filter = "brightness(65%)";
+      });
     };
 
     const addWebGazeListener = (): void => {
