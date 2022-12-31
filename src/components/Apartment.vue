@@ -51,12 +51,23 @@ export default {
 
     watch(deviceValue, (value) => {
       if (value !== null && value.length > 0) setSelectedDevices(value);
+      else {
+        resetUnSelectedDevices(value);
+      }
     });
 
     const setSelectedDevices = (value: string[]) => {
       value.forEach((id: string) => {
         const deviceEl: HTMLElement | null = (svgContent.value! as HTMLElement).querySelector(`g[id='${id}']`);
         deviceEl!.style.filter = "brightness(65%)";
+      });
+    };
+
+    const resetUnSelectedDevices = (value: string[]) => {
+      const notFocusedDevices =  Object.values(deviceIds).filter((id) => !value.includes(id));
+      notFocusedDevices.forEach((id: string) => {
+        const deviceEl: HTMLElement | null = (svgContent.value! as HTMLElement).querySelector(`g[id='${id}']`);
+        deviceEl!.style.filter = "brightness(100%)";
       });
     };
 

@@ -10,8 +10,8 @@
       <div>1. Select the <b>device</b> or <b>devices</b>.</div>
       <div>2. Select the <b>time frame</b>.</div>
       <div>3. Decide if a <b>ranking</b> should be shown. (If yes, the energy consumption is summed up for the selected time frame.)</div>
-      <div>Appliances:</div>
-      <div>1. Click on a room to select the devices of a room</div>
+      <div class="instructions__text-headline-2"><b>Rooms:</b></div>
+      <div>1. Click on a <b>room</b> to select the devices of a room</div>
     </template>
   </div>
 </div>
@@ -38,7 +38,16 @@ export default {
 
   .instructions__text-headline {
     margin-bottom: 5px;
+    font-size: 13px;
+    text-decoration: underline;
   }
+
+  .instructions__text-headline-2 {
+    margin-top: 5px;
+    font-size: 13px;
+    text-decoration: underline;
+  }
+
 
   .instructions__text {
     background-color: var(--color-light);
@@ -46,7 +55,7 @@ export default {
     border: 2px solid var(--color-primary);
     border-radius: 10px;
     padding: 10px;
-    height: 75%;
+    height: 80%;
     text-align: left;
     font-size: 12px;
   }
