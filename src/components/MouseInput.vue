@@ -133,6 +133,7 @@ export default {
       border-width: 2px;
       color: var(--color-primary);
       margin: 0;
+      user-select: none;
 
       &:focus-visible {
         outline: var(--color-primary) auto 1px;
@@ -181,7 +182,7 @@ export default {
 
   .mouse-input-btn {
     width: 20%;
-    height: 40%;
+    height: 45px;
     align-self: top;
     margin-top: 23px;
   }

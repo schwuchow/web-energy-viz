@@ -21,12 +21,17 @@
 
 <script lang="ts">
 import houseImg from '../assets/house.svg';
-import { ref, onMounted, VNodeRef } from 'vue';
+import { ref, onMounted, VNodeRef, watch } from 'vue';
+import { useDevicesStore } from '../store';
+import { storeToRefs } from 'pinia';
 
 export default {
   setup() {
     const allDevices: VNodeRef | null = ref(null);
     const isSelected = ref(false);
+    const store = useDevicesStore();
+		const { deviceValue } = storeToRefs(store);
+    const { deviceIds } = store;
 
     onMounted(() => {
     });
@@ -34,6 +39,14 @@ export default {
     const toggleSelected = (ev: Event) => {
       isSelected.value = !isSelected.value;
     };
+
+    watch(isSelected, (value) => {
+      if (value) {
+        deviceValue.value = Object.values(deviceIds);
+      } else {
+        deviceValue.value = [];
+      }
+    });
 
     return { houseImg, allDevices, isSelected, toggleSelected };
   }
@@ -90,6 +103,10 @@ export default {
         font-size: 35px;
       }
     }
+
+    &:hover {
+      background-color: #8c8fd8;
+    }
   }
 
   .selected {
@@ -115,6 +132,10 @@ export default {
           color: #F7B634;
         }
       }
+    }
+
+    &:hover {
+      background-color: #daa12f;
     }
   }
 }
