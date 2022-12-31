@@ -123,12 +123,10 @@ export default {
 		}
 
 		function checkForTimePeriod(t) {
-			var timePeriod = TimePeriod.ALL_TIME;
-
-			if (t.includes("yesterday")) {
+			if (t.includes("today")) {
 				timePeriod = TimePeriod.YESTERDAY;
-			} else if (t.includes("last two weeks")) {
-				timePeriod = TimePeriod.LAST_TWO_WEEEKS;
+			} else if (t.includes("yesterday")) {
+				timePeriod = TimePeriod.LAST_WEEK;
 			} else if (t.includes("last week")) {
 				timePeriod = TimePeriod.LAST_WEEK;
 			} else if (t.includes("last month")) {

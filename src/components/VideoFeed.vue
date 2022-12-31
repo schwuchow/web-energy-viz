@@ -10,12 +10,12 @@
 
 <script lang="ts">
 import weatherImg from '../assets/weather.svg';
+import { useDevicesStore } from '../store';
 
 export default {
   setup() {
-    const monthNames = ["January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"
-    ];
+    const store = useDevicesStore();
+    const { monthNames } = store;
 
     const getCurrentDayAndTime = (): string => {
       const today = new Date(Date.now());

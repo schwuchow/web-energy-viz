@@ -12,7 +12,7 @@
 import { onMounted, watch } from 'vue';
 import { useDevicesStore } from '../store';
 import { storeToRefs } from 'pinia';
-import { showHierarchicalBarChart, showRadialBarChart, showScatterPlotChart  } from '../visualizations';
+import { showHierarchicalBarChart, showRadialBarChart, showScatterPlotChart, showSinglePointData  } from '../visualizations';
 import { Visualization } from '../types/interfaces';
 import { TimePeriod } from '../types/enums';
 // @ts-ignore
@@ -44,6 +44,7 @@ export default {
         hasOneDeviceAndOneMonthPeriod: !visualization.ranking && visualization.deviceIds.length === 1 && 
           visualization.timePeriod === TimePeriod.LAST_MONTH,
         hasShortTimePeriod: !visualization.ranking && visualization.timePeriod !== TimePeriod.LAST_MONTH,
+        isSinglePointData: visualization.timePeriod === TimePeriod.TODAY || visualization.timePeriod === TimePeriod.YESTERDAY
       };
 
       if (rules.hasRankingOfMultipleDevices) {
@@ -57,6 +58,24 @@ export default {
 
         showHierarchicalBarChart(data);
 
+      } else if (rules.isSinglePointData) {
+        const time = timeFrame(visualization.timePeriod);
+        const deviceIds = visualization.deviceIds;
+
+        var dayData = dataset.filter((d: any) => {
+          if (parseInt(d.Day) === time) return d;
+        });
+
+        var data: any = [];
+
+        deviceIds.forEach((id: string) => {
+          const name = devices.value.get(id)?.name;
+
+          data.push({ id, name, Value:  dayData[0][id] });
+        });
+
+        showSinglePointData(data, visualization.timePeriod);
+
       } else if (rules.hasOneDeviceAndOneMonthPeriod) {
         const deviceId = visualization.deviceIds[0];
         var data = dataset.map((d: any) => ({ Day: d.Day, Value: d[deviceId] }));
@@ -67,7 +86,7 @@ export default {
         const deviceIds = visualization.deviceIds;
         const time = timeFrame(visualization.timePeriod);
 
-        var data: any = deviceIds.map((id: any) => {
+        var data: any = deviceIds.map((id: string) => {
             const name = devices.value.get(id)?.name;
 
             return {
@@ -116,8 +135,6 @@ export default {
           }
         case TimePeriod.LAST_MONTH:
           return 31;
-        case TimePeriod.ALL_TIME:
-          return today;
         default: return today;
       };
     };

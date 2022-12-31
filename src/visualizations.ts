@@ -303,6 +303,46 @@ export const showScatterPlotChart = (data: any, deviceIds: string[]) => {
         .style("font-size", 10)
 };
 
+export const showSinglePointData = (data: any, date: string) => {
+  console.log(data);
+
+  resetVisualization();
+
+    // set the dimensions and margins of the graph
+    var margin = {top: 10, right: 10, bottom: 10, left: 10},
+    width = 370 - margin.left - margin.right,
+    height = 450 - margin.top - margin.bottom;
+
+  // append the svg object to the body of the page
+  var svg = d3.select(".visualization__container-svg")
+    .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+      .attr("transform",
+            "translate(" + margin.left + "," + margin.top + ")");
+
+  svg.append("text")
+    .style("fill", "#2E0B49")
+    .style("font-size", 20)
+    .attr("x",width / 2 - (margin.left + margin.right))
+    .attr("y", margin.top + 10)
+    .text(date);
+
+
+  svg.selectAll(".device-text")
+    .data(data)
+    .enter()
+    .append("text")
+      .style("fill", "#2E0B49")
+      .style("font-size", 24)
+      .style("font-weight", "bold")
+      .attr("class", "device-text")
+      .attr("transform", "translate(10,50)")
+      .attr("y", function(d: any, index: number) { return 40 * (index + 1) })
+      .text(function(d: any) { return `${d.name}: ${d.Value}` });
+}
+
 const resetVisualization = () => {
   d3.select(".visualization__container-svg").html("");
 };

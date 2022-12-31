@@ -29,6 +29,10 @@ export const useDevicesStore = defineStore('devices', () => {
     kitchenCoffeeMachine2: "Coffee Machine 2",
   }
 
+  const monthNames = ["January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
   const multimodal: Ref<boolean> = ref(false);
 
   const svgContent: Ref<HTMLElement & SVGElement> | Ref<null> = ref(null);
@@ -37,5 +41,5 @@ export const useDevicesStore = defineStore('devices', () => {
   const deviceValue: Ref<string[]> = ref([]);
   const visualization: Ref<Visualization> | Ref<null> = ref(null);
 
-  return { deviceIds, deviceValue, deviceNames, devices, visualization, svgContent, multimodal };
+  return { deviceIds, deviceValue, deviceNames, devices, visualization, svgContent, multimodal, monthNames };
 });
