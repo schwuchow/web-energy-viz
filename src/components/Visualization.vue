@@ -66,7 +66,7 @@ export default {
           }
         })
 
-        showHierarchicalBarChart(data);
+        showHierarchicalBarChart(data, visualization.timePeriod);
 
       } else if (rules.isSinglePointData) {
         const time = timeFrame(visualization.timePeriod);
@@ -108,7 +108,7 @@ export default {
             };
         });
 
-        showScatterPlotChart(data, deviceIds);
+        showScatterPlotChart(data, deviceIds, visualization.timePeriod);
       }
     };
 

@@ -1,12 +1,12 @@
 import * as d3 from "d3";
 
-export const showHierarchicalBarChart = (data: any) => {
+export const showHierarchicalBarChart = (data: any, date: string) => {
   console.log(data);
 
   resetVisualization();
 
   // set the dimensions and margins of the graph
-  var margin = {top: 10, right: 10, bottom: 110, left: 100},
+  var margin = {top: 50, right: 10, bottom: 150, left: 100},
       width = 370 - margin.left - margin.right,
       height = 450 - margin.top - margin.bottom;
 
@@ -42,6 +42,16 @@ export const showHierarchicalBarChart = (data: any) => {
       .attr("transform", "translate(-10,0)rotate(-45)")
       .style("text-anchor", "end");
 
+  // Add X axis label:
+  svg.append("text")
+    .attr("text-anchor", "end")
+    .attr("x", width)
+    .attr("y", height + margin.top + 20)
+    .style("font-size", "11px")
+    .style("font-weight", "bold")
+    .text("Power (Watt)");
+
+
   // Y axis
   var y = d3.scaleBand()
     .range([ 0, height ])
@@ -50,6 +60,15 @@ export const showHierarchicalBarChart = (data: any) => {
 
   svg.append("g")
     .call(d3.axisLeft(y));
+
+  // Y axis label:
+  svg.append("text")
+    .attr("text-anchor", "end")
+    .attr("x", -margin.top + 70)
+    .attr("y", -margin.left + 90)
+    .style("font-size", "11px")
+    .style("font-weight", "bold")
+    .text("Device");
 
   //Bars
   svg.selectAll("rect")
@@ -70,6 +89,15 @@ export const showHierarchicalBarChart = (data: any) => {
     .attr("width", function(d: any) { return x(d.sum); })
     .attr("height", y.bandwidth() )
     .delay(function(d: any,i){ return(i * 100) });
+
+
+  // Date Label
+  svg.append("text")
+    .style("fill", "#2E0B49")
+    .style("font-size", 20)
+    .attr("x", margin.left)
+    .attr("y", -margin.top + 30)
+    .text(date);
 };
 
 export const showRadialBarChart = (data: any, name: string) => {
@@ -200,7 +228,7 @@ export const showRadialBarChart = (data: any, name: string) => {
       .style("font", "16px times")
       .style("fill", "#2E0B49")
       .attr("transform", "translate(-50, 0)")
-      .text(function(d: any) { return "Total: " + total });
+      .text(function(d: any) { return "Total: " + Math.round(total / 1000)  + " kW"});
 
   // Add the labels
   // svg.append("g")
@@ -217,12 +245,12 @@ export const showRadialBarChart = (data: any, name: string) => {
   //       .attr("alignment-baseline", "middle");
 };
 
-export const showScatterPlotChart = (data: any, deviceIds: string[]) => {
+export const showScatterPlotChart = (data: any, deviceIds: string[], date: string) => {
   console.log(data);
 
   resetVisualization();
 
-  const margin = {top: 10, right: 110, bottom: 30, left: 60},
+  const margin = {top: 60, right: 110, bottom: 60, left: 60},
   width = 380 - margin.left - margin.right,
   height = 400 - margin.top - margin.bottom;
 
@@ -252,12 +280,30 @@ export const showScatterPlotChart = (data: any, deviceIds: string[]) => {
     .attr("transform", "translate(0," + height + ")")
     .call(d3.axisBottom(x));
 
+  // Add X axis label:
+  svg.append("text")
+    .attr("text-anchor", "end")
+    .attr("x", width + 40)
+    .attr("y", height + 5)
+    .style("font-size", "11px")
+    .style("font-weight", "bold")
+    .text("Date");
+
   // Add Y axis
   const y = d3.scaleLinear()
     .domain( [minDomain, maxDomain])
     .range([ height, 0 ]);
   svg.append("g")
     .call(d3.axisLeft(y));
+
+  // Add Y axis label:
+  svg.append("text")
+    .attr("text-anchor", "end")
+    .attr("x", -margin.top + 70)
+    .attr("y", -margin.left + 50)
+    .style("font-size", "11px")
+    .style("font-weight", "bold")
+    .text("Power (Watt)");
 
   // Add the lines
   const line: any = d3.line()
@@ -308,6 +354,14 @@ export const showScatterPlotChart = (data: any, deviceIds: string[]) => {
         .text(function(d) { return d.name; })
         .style("fill", function(d){ return colors(d.name) })
         .style("font-size", 10)
+
+  // Date Label
+  svg.append("text")
+    .style("fill", "#2E0B49")
+    .style("font-size", 16)
+    .attr("x", 0)
+    .attr("y", -margin.top + 30)
+    .text(`Energy Consumption (${date})`);
 };
 
 export const showSinglePointData = (data: any, date: string) => {
@@ -347,7 +401,7 @@ export const showSinglePointData = (data: any, date: string) => {
       .attr("class", "device-text")
       .attr("transform", "translate(10,50)")
       .attr("y", function(d: any, index: number) { return 40 * (index + 1) })
-      .text(function(d: any) { return `${d.name}: ${d.Value}` });
+      .text(function(d: any) { return `${d.name}: ${d.Value} Watt` });
 }
 
 const resetVisualization = () => {
