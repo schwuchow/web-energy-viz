@@ -10,3 +10,8 @@ export interface Device {
   position: DOMRect,
   name: string,
 }
+
+export interface TimeFrame {
+  startDate: number,
+  endDate: number,
+}

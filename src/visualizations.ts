@@ -238,7 +238,8 @@ export const showScatterPlotChart = (data: any, deviceIds: string[]) => {
       .range(d3.schemeSet2);
 
   const x = d3.scaleLinear()
-    .domain([0, values[0].length])
+    // .domain(data[0].values.map(function(d: any, index: number) { console.log(d.Day); return d.Date }))
+    .domain([0, 31])
     .range([ 0, width ]);
 
   svg.append("g")

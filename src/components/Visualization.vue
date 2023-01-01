@@ -13,7 +13,7 @@ import { onMounted, watch } from 'vue';
 import { useDevicesStore } from '../store';
 import { storeToRefs } from 'pinia';
 import { showHierarchicalBarChart, showRadialBarChart, showScatterPlotChart, showSinglePointData  } from '../visualizations';
-import { Visualization } from '../types/interfaces';
+import { Visualization, TimeFrame } from '../types/interfaces';
 import { TimePeriod } from '../types/enums';
 // @ts-ignore
 import dataset from '../datasets/data.csv';
@@ -43,7 +43,7 @@ export default {
         hasRankingOfMultipleDevices: visualization.ranking && visualization.deviceIds.length > 1,
         hasOneDeviceAndOneMonthPeriod: !visualization.ranking && visualization.deviceIds.length === 1 && 
           visualization.timePeriod === TimePeriod.LAST_MONTH,
-        hasShortTimePeriod: !visualization.ranking && visualization.timePeriod !== TimePeriod.LAST_MONTH,
+        hasShortTimePeriod: !visualization.ranking && visualization.timePeriod === TimePeriod.LAST_WEEK,
         isSinglePointData: visualization.timePeriod === TimePeriod.TODAY || visualization.timePeriod === TimePeriod.YESTERDAY
       };
 
@@ -84,7 +84,7 @@ export default {
 
       } else if (rules.hasShortTimePeriod) {
         const deviceIds = visualization.deviceIds;
-        const time = timeFrame(visualization.timePeriod);
+        const time = timeFrame(visualization.timePeriod) as TimeFrame;
 
         var data: any = deviceIds.map((id: string) => {
             const name = devices.value.get(id)?.name;
@@ -92,7 +92,7 @@ export default {
             return {
               name: name,
               values: dataset.filter((d: any, index: number) => {
-                if (index < time) return d;
+                if (inTimeFrame(time, index)) return d;
               }).map((d: any) => ({ Day: d.Day, Value: d[id] }))
             };
         });
@@ -112,7 +112,7 @@ export default {
       return sum;
     };
 
-    const timeFrame = (timePeriod: TimePeriod) => {
+    const timeFrame = (timePeriod: TimePeriod): number | TimeFrame => {
       const today = getCurrentDay();
 
       switch(timePeriod) {
@@ -122,7 +122,14 @@ export default {
           if (today === 1) return 31;
           else return today - 1;
         case TimePeriod.LAST_WEEK:
-          if (today > 7) return today - 7;
+          let startDate;
+          let endDate;
+
+          if (today > 7) {
+            startDate = today - 7;
+            endDate = today;
+            return { startDate, endDate };
+          }
           else {
             let daysLeft = 7;
             let dayOfToday = today;
@@ -130,13 +137,20 @@ export default {
               dayOfToday -= 1;
               daysLeft -= 1;
             }
-            console.log(daysLeft);
-            return 31 - daysLeft;
+            startDate = 31 - daysLeft;
+            endDate = today;
+            console.log(startDate, endDate);
+            return { startDate, endDate };
           }
         case TimePeriod.LAST_MONTH:
           return 31;
         default: return today;
       };
+    };
+
+    const inTimeFrame = (timeObj: TimeFrame, index: number): boolean => {
+        const { startDate, endDate } = timeObj;
+        return index >= startDate || index < endDate;
     };
 
     return { visualization };
