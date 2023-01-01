@@ -72,13 +72,13 @@ export const showHierarchicalBarChart = (data: any) => {
     .delay(function(d: any,i){ return(i * 100) });
 };
 
-export const showRadialBarChart = (data: any, deviceId: string) => {
+export const showRadialBarChart = (data: any, name: string) => {
   console.log(data);
 
   resetVisualization();
 
   // set the dimensions and margins of the graph
-  const margin = {top: 10, right: 10, bottom: 10, left: 10},
+  const margin = {top: -20, right: 10, bottom: 10, left: 10},
       width = 370 - margin.left - margin.right,
       height = 450 - margin.top - margin.bottom,
       innerRadius = 80,
@@ -161,9 +161,16 @@ export const showRadialBarChart = (data: any, deviceId: string) => {
 
   yAxis.append("text")
       .attr("y", function(d) { return -y(y.ticks(5).pop()!); })
-      .attr("dy", "-1em")
+      .attr("dy", "-2.5em")
       .style("fill", "#2E0B49")
       .text("Energy Consumption (month)");
+
+  yAxis.append("text")
+    .attr("y", function(d) { return -y(y.ticks(5).pop()!); })
+    .attr("dy", "-1em")
+    .style("fill", "#2E0B49")
+    .style("font-weight", "bold")
+    .text(name);
 
   // Add day labels
   const label = svg.append("g")
@@ -194,7 +201,6 @@ export const showRadialBarChart = (data: any, deviceId: string) => {
       .style("fill", "#2E0B49")
       .attr("transform", "translate(-50, 0)")
       .text(function(d: any) { return "Total: " + total });
-
 
   // Add the labels
   // svg.append("g")

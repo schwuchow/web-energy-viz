@@ -44,7 +44,7 @@ export default {
         hasOneDeviceAndOneMonthPeriod: !visualization.ranking && visualization.deviceIds.length === 1 && 
           visualization.timePeriod === TimePeriod.LAST_MONTH,
         hasShortTimePeriod: !visualization.ranking && visualization.timePeriod === TimePeriod.LAST_WEEK,
-        isSinglePointData: visualization.timePeriod === TimePeriod.TODAY || visualization.timePeriod === TimePeriod.YESTERDAY
+        isSinglePointData: !visualization.ranking && visualization.timePeriod === TimePeriod.TODAY || visualization.timePeriod === TimePeriod.YESTERDAY
       };
 
       if (rules.hasRankingOfMultipleDevices) {
@@ -52,8 +52,18 @@ export default {
 
         visualization.deviceIds.forEach(id => {
           const name = devices.value.get(id)?.name;
-          const sum = calcSumOfConsumption(id);
-          data.push({ sum, name });
+
+          if (visualization.timePeriod === TimePeriod.LAST_MONTH) {
+            const sum = calcSumOfConsumption(id);
+            data.push({ sum, name });
+          } else if (visualization.timePeriod === TimePeriod.TODAY || visualization.timePeriod === TimePeriod.YESTERDAY) {
+            const time = timeFrame(visualization.timePeriod);
+            const day = dataset.find((d: any) => {
+              return parseInt(d.Day) === time
+            });
+            const sum = parseInt(day[id]);
+            data.push({ sum, name });
+          }
         })
 
         showHierarchicalBarChart(data);
@@ -78,9 +88,10 @@ export default {
 
       } else if (rules.hasOneDeviceAndOneMonthPeriod) {
         const deviceId = visualization.deviceIds[0];
+        const name = devices.value.get(deviceId)?.name;
         var data = dataset.map((d: any) => ({ Day: d.Day, Value: d[deviceId] }));
 
-        showRadialBarChart(data, deviceId);
+        showRadialBarChart(data, name!);
 
       } else if (rules.hasShortTimePeriod) {
         const deviceIds = visualization.deviceIds;
