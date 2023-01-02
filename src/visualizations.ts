@@ -1,10 +1,12 @@
 import * as d3 from "d3";
-// @ts-ignore
-import washingMashineData from './datasets/data.csv';
 
-export const showHierarchicalBarChart = () => {
+export const showHierarchicalBarChart = (data: any, date: string) => {
+  console.log(data);
+
+  resetVisualization();
+
   // set the dimensions and margins of the graph
-  var margin = {top: 10, right: 10, bottom: 110, left: 30},
+  var margin = {top: 50, right: 10, bottom: 150, left: 100},
       width = 370 - margin.left - margin.right,
       height = 450 - margin.top - margin.bottom;
 
@@ -17,13 +19,12 @@ export const showHierarchicalBarChart = () => {
       .attr("transform",
             "translate(" + margin.left + "," + margin.top + ")");
 
-  const data = washingMashineData.slice(0, 32);
-  const values = data.map((d: any) => d.Value);
+  const values = data.map((d: any) => d.sum);
   const maxDomain = Math.max(...values);
 
   const rankedData = data.sort(function(obj1: any, obj2: any) {
-    if (obj1.Value < obj2.Value) return 1;
-    if (obj1.Value > obj2.Value) return -1;
+    if (obj1.sum < obj2.sum) return 1;
+    if (obj1.sum > obj2.sum) return -1;
     return 0;
   });
 
@@ -41,14 +42,33 @@ export const showHierarchicalBarChart = () => {
       .attr("transform", "translate(-10,0)rotate(-45)")
       .style("text-anchor", "end");
 
+  // Add X axis label:
+  svg.append("text")
+    .attr("text-anchor", "end")
+    .attr("x", width)
+    .attr("y", height + margin.top + 20)
+    .style("font-size", "11px")
+    .style("font-weight", "bold")
+    .text("Power (Watt)");
+
+
   // Y axis
   var y = d3.scaleBand()
     .range([ 0, height ])
-    .domain(rankedData.map(function(d: any) { return d.Day; }))
+    .domain(rankedData.map(function(d: any) { return d.name; }))
     .padding(.1);
 
   svg.append("g")
     .call(d3.axisLeft(y));
+
+  // Y axis label:
+  svg.append("text")
+    .attr("text-anchor", "end")
+    .attr("x", -margin.top + 70)
+    .attr("y", -margin.left + 90)
+    .style("font-size", "11px")
+    .style("font-weight", "bold")
+    .text("Device");
 
   //Bars
   svg.selectAll("rect")
@@ -56,7 +76,7 @@ export const showHierarchicalBarChart = () => {
     .enter()
     .append("rect")
     .attr("x", x(0) )
-    .attr("y", function(d:any) { return y(d.Day)!; })
+    .attr("y", function(d:any) { return y(d.name)!; })
     .attr("height", y.bandwidth() )
     .attr("fill", "#A5A9FF");
 
@@ -65,15 +85,28 @@ export const showHierarchicalBarChart = () => {
   svg.selectAll("rect")
     .transition()
     .duration(800)
-    .attr("y", function(d: any) { return y(d.Day)!; })
-    .attr("width", function(d: any) { return x(d.Value); })
+    .attr("y", function(d: any) { return y(d.name)!; })
+    .attr("width", function(d: any) { return x(d.sum); })
     .attr("height", y.bandwidth() )
     .delay(function(d: any,i){ return(i * 100) });
+
+
+  // Date Label
+  svg.append("text")
+    .style("fill", "#2E0B49")
+    .style("font-size", 20)
+    .attr("x", margin.left)
+    .attr("y", -margin.top + 30)
+    .text(date);
 };
 
-export const showRadialBarChart = () => {
+export const showRadialBarChart = (data: any, name: string) => {
+  console.log(data);
+
+  resetVisualization();
+
   // set the dimensions and margins of the graph
-  const margin = {top: 10, right: 10, bottom: 10, left: 10},
+  const margin = {top: -20, right: 10, bottom: 10, left: 10},
       width = 370 - margin.left - margin.right,
       height = 450 - margin.top - margin.bottom,
       innerRadius = 80,
@@ -86,10 +119,6 @@ export const showRadialBarChart = () => {
       .attr("height", height + margin.top + margin.bottom)
     .append("g")
       .attr("transform", "translate(" + width / 2 + "," + ( height / 2) + ")");
-
-  const data = washingMashineData.slice(0, 32);
-
-  console.log(data);
 
   // X scale
   const x = d3.scaleBand()
@@ -118,7 +147,7 @@ export const showRadialBarChart = () => {
     .data(data)
     .enter()
     .append("path")
-      .attr("fill", "#A5A9FF")
+    .attr("fill", "#A5A9FF")
 
   // Animation
   svg.selectAll("path")
@@ -160,9 +189,16 @@ export const showRadialBarChart = () => {
 
   yAxis.append("text")
       .attr("y", function(d) { return -y(y.ticks(5).pop()!); })
-      .attr("dy", "-1em")
+      .attr("dy", "-2.5em")
       .style("fill", "#2E0B49")
       .text("Energy Consumption (month)");
+
+  yAxis.append("text")
+    .attr("y", function(d) { return -y(y.ticks(5).pop()!); })
+    .attr("dy", "-1em")
+    .style("fill", "#2E0B49")
+    .style("font-weight", "bold")
+    .text(name);
 
   // Add day labels
   const label = svg.append("g")
@@ -192,8 +228,7 @@ export const showRadialBarChart = () => {
       .style("font", "16px times")
       .style("fill", "#2E0B49")
       .attr("transform", "translate(-50, 0)")
-      .text(function(d: any) { return "Total: " + total });
-
+      .text(function(d: any) { return "Total: " + Math.round(total / 1000)  + " kW"});
 
   // Add the labels
   // svg.append("g")
@@ -210,11 +245,14 @@ export const showRadialBarChart = () => {
   //       .attr("alignment-baseline", "middle");
 };
 
-export const showScatterPlotChart = () => {
-  const margin = {top: 10, right: 30, bottom: 30, left: 60},
+export const showScatterPlotChart = (data: any, deviceIds: string[], date: string) => {
+  console.log(data);
+
+  resetVisualization();
+
+  const margin = {top: 60, right: 110, bottom: 60, left: 60},
   width = 380 - margin.left - margin.right,
   height = 400 - margin.top - margin.bottom;
-
 
   // append the svg object to the body of the page
   const svg = d3.select(".visualization__container-svg")
@@ -224,21 +262,32 @@ export const showScatterPlotChart = () => {
     .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-  const data = washingMashineData.slice(0, 32);
-  const values = data.map((d: any) => d.Value);
-  const maxDomain = Math.max(...values);
-  const minDomain = Math.min(...values);
+  const values = data.map((d: any) => d.values.map(({Day, Value}: any) => +Value));
+  const flattenValues = values.flat();
+  const maxDomain = Math.max(...flattenValues);
+  const minDomain = Math.min(...flattenValues);
 
-  console.log(data);
-
+  const colors: any = d3.scaleOrdinal()
+      .domain(deviceIds)
+      .range(d3.schemeSet2);
 
   const x = d3.scaleLinear()
+    // .domain(data[0].values.map(function(d: any, index: number) { console.log(d.Day); return d.Date }))
     .domain([0, 31])
     .range([ 0, width ]);
 
   svg.append("g")
     .attr("transform", "translate(0," + height + ")")
     .call(d3.axisBottom(x));
+
+  // Add X axis label:
+  svg.append("text")
+    .attr("text-anchor", "end")
+    .attr("x", width + 40)
+    .attr("y", height + 5)
+    .style("font-size", "11px")
+    .style("font-weight", "bold")
+    .text("Date");
 
   // Add Y axis
   const y = d3.scaleLinear()
@@ -247,37 +296,114 @@ export const showScatterPlotChart = () => {
   svg.append("g")
     .call(d3.axisLeft(y));
 
-  // Add the line
-  svg.append("path")
-    .datum(data)
-    .attr("fill", "none")
-    .attr("stroke", "#A5A9FF")
-    .attr("stroke-width", 2)
-    .attr("d", d3.line()
+  // Add Y axis label:
+  svg.append("text")
+    .attr("text-anchor", "end")
+    .attr("x", -margin.top + 70)
+    .attr("y", -margin.left + 50)
+    .style("font-size", "11px")
+    .style("font-weight", "bold")
+    .text("Power (Watt)");
+
+  // Add the lines
+  const line: any = d3.line()
       .x((d: any) => x(d.Day))
       .y((d: any) => y(d.Value))
-      );
+
+  svg.selectAll("myLines")
+    .data(data)
+    .enter()
+    .append("path")
+      .attr("d", function(d: any){ return line(d.values) } )
+      .attr("stroke", function(d: any){ return colors(d.name) })
+      .style("stroke-width", 2)
+      .style("fill", "none")
 
   // Add the points
-  svg.append("g")
-    .selectAll("dot")
-    .data(data)
-    .join("circle")
-      .attr("cx", (d: any) => x(d.Day))
-      .attr("cy", (d: any) => y(d.Value))
-      .attr("r", 4)
-      .attr("fill", "#A5A9FF")
-      .attr("stroke", "#fff")
-      .attr("stroke-width", 1.5);
+  svg.selectAll("myDots")
+  .data(data)
+  .enter()
+    .append('g')
+    .style("fill", function(d: any){ return colors(d.name) })
+  // Second we need to enter in the 'values' part of this group
+  .selectAll("myPoints")
+  .data(function(d: any){ return d.values })
+  .enter()
+  .append("circle")
+    .transition()
+    .duration(300)
+    .attr("cx", function(d: any) { return x(d.Day) } )
+    .attr("cy", function(d: any) { return y(d.Value) } )
+    .attr("r", 4)
+    .attr("stroke", "white")
+    .attr("stroke-width", 1.5)
+    .delay(function(d: any, i){ return (i * 50) });
 
-  // Animation
-  // svg.selectAll("path")
-  //   .transition()
-  //   .duration(300)
-  //   .attr("y", function(d: any) { return y(d.Day)!; })
-  //   // .attr("d", d3.line()
-  //   //   .x((d: any) => x(d.Day))
-  //   //   .y((d: any) => y(d.Value))
-  //   // )
-  //   .delay(function(d: any,i){ return(i * 50) });
-  };
+  // Add a legend at the end of each line
+  svg
+    .selectAll("myLabels")
+    .data(data)
+    .enter()
+      .append('g')
+      .append("text")
+        // keep only the last value of each time series
+        .datum(function(d: any) { return {name: d.name, value: d.values[d.values.length - 1]}; })
+        // Put the text at the position of the last point
+        .attr("transform", function(d) { return "translate(" + x(d.value.Day) + "," + y(d.value.Value) + ")"; })
+        .attr("x", 12) // shift the text a bit more right
+        .text(function(d) { return d.name; })
+        .style("fill", function(d){ return colors(d.name) })
+        .style("font-size", 10)
+
+  // Date Label
+  svg.append("text")
+    .style("fill", "#2E0B49")
+    .style("font-size", 16)
+    .attr("x", 0)
+    .attr("y", -margin.top + 30)
+    .text(`Energy Consumption (${date})`);
+};
+
+export const showSinglePointData = (data: any, date: string) => {
+  console.log(data);
+
+  resetVisualization();
+
+    // set the dimensions and margins of the graph
+    var margin = {top: 10, right: 10, bottom: 10, left: 10},
+    width = 370 - margin.left - margin.right,
+    height = 450 - margin.top - margin.bottom;
+
+  // append the svg object to the body of the page
+  var svg = d3.select(".visualization__container-svg")
+    .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+      .attr("transform",
+            "translate(" + margin.left + "," + margin.top + ")");
+
+  svg.append("text")
+    .style("fill", "#2E0B49")
+    .style("font-size", 20)
+    .attr("x",width / 2 - (margin.left + margin.right))
+    .attr("y", margin.top + 10)
+    .text(date);
+
+
+  svg.selectAll(".device-text")
+    .data(data)
+    .enter()
+    .append("text")
+      .style("fill", "#2E0B49")
+      .style("font-size", 24)
+      .style("font-weight", "bold")
+      .attr("class", "device-text")
+      .attr("transform", "translate(10,50)")
+      .attr("y", function(d: any, index: number) { return 40 * (index + 1) })
+      .text(function(d: any) { return `${d.name}: ${d.Value} Watt` });
+}
+
+const resetVisualization = () => {
+  d3.select(".visualization__container-svg").html("");
+};

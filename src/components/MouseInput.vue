@@ -6,6 +6,7 @@
       v-model="deviceValue"
       :options="deviceOptions"
       placeholder="Freezer, Coffee Machine, ..."
+      mode="tags"
       />
     </div>
     <div class="mouse-input-row">
@@ -25,26 +26,22 @@
 </template>
 
 <script lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, Ref, watch } from 'vue';
 import Multiselect from '@vueform/multiselect';
 import { TimePeriod } from '../types/enums';
 import { useDevicesStore } from '../store';
 import { storeToRefs } from 'pinia';
+import { Device } from '../types/interfaces';
 
 export default {
   components: { Multiselect },
   setup() {
     const store = useDevicesStore();
-		const { visualization, devices, svgContent } = storeToRefs(store);
-    const deviceValue = ref("All devices");
-    const deviceOptions = ["All devices", "Refrigerator", "Dryer", "Coffee Machine", "Washing Machine", "Freezer"];
+		const { visualization, devices, svgContent, deviceValue } = storeToRefs(store);
     const timeValue = ref(0);
     const checked = ref(false);
     let timeOptions: TimePeriod[] = [];
-
-    for (const value in TimePeriod) {
-        timeOptions.push(TimePeriod[value as keyof typeof TimePeriod]);
-    }
+    let deviceOptions: Ref<Object[]> = ref([]);
 
     onMounted(() => {
       console.log("MOUNTED MOUSE");
@@ -52,9 +49,23 @@ export default {
       setTimeout(() => setEventListener(), 2000);
     });
 
+    const setSelectOptions = () => {
+      for (const value in TimePeriod) {
+        timeOptions.push(TimePeriod[value as keyof typeof TimePeriod]);
+      }
+    };
+
+    setSelectOptions();
+
+    watch(devices.value, (value) => {
+      value.forEach((device: Device, id: string) => {
+        deviceOptions.value.push({ value: id, label: device.name });
+      });
+    })
+
     const setEventListener = () => {
       if (devices.value && svgContent.value) {
-        devices.value.forEach((device: DOMRect, id: string) => {
+        devices.value.forEach((device: Device, id: string) => {
           const deviceEl = (svgContent.value! as HTMLElement).querySelector(`g[id='${id}']`);
 
           if (deviceEl) deviceEl.addEventListener("mouseover", setFocus);
@@ -78,13 +89,14 @@ export default {
     const setVisualization = () => {
       const newVisualization = {
 					timePeriod: timeValue.value,
-					deviceId: deviceValue.value,
+					deviceIds: deviceValue.value,
+          ranking: checked,
       };
 
       visualization.value = newVisualization as any;
     };
 
-    return { checked, deviceValue, timeValue, deviceOptions, timeOptions, setVisualization };
+    return { checked, deviceValue, devices, timeValue, deviceOptions, timeOptions, setVisualization };
   }
 }
 </script>
@@ -121,6 +133,7 @@ export default {
       border-width: 2px;
       color: var(--color-primary);
       margin: 0;
+      user-select: none;
 
       &:focus-visible {
         outline: var(--color-primary) auto 1px;
@@ -147,6 +160,7 @@ export default {
 
       & + label {
         cursor: pointer;
+        user-select: none;
       }
     }
 
@@ -168,7 +182,7 @@ export default {
 
   .mouse-input-btn {
     width: 20%;
-    height: 40%;
+    height: 45px;
     align-self: top;
     margin-top: 23px;
   }

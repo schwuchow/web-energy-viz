@@ -8,26 +8,27 @@
     <MouseInput />
   </template>
   <Instructions />
-  <Apartment />
   <Visualization />
-  <Appliances />
+  <Apartment />
+  <Rooms />
 </div>
 </template>
 
 <script lang="ts">
 import Instructions from './components/Instructions.vue';
 import VideoFeed from './components/VideoFeed.vue';
-import Appliances from './components/Appliances.vue';
+import Rooms from './components/Rooms.vue';
 import Visualization from './components/Visualization.vue';
 import Apartment from './components/Apartment.vue';
 import MouseInput from './components/MouseInput.vue';
 import SpeechInput from './components/SpeechInput.vue';
-import { ref } from 'vue'
+import { useDevicesStore } from './store';
+import { storeToRefs } from 'pinia';
 
 export default {
   components: {
     VideoFeed,
-    Appliances,
+    Rooms,
     Instructions,
     Visualization,
     Apartment,
@@ -35,7 +36,8 @@ export default {
     SpeechInput,
   },
   setup() {
-    const multimodal = ref(false);
+    const store = useDevicesStore();
+		const { multimodal } = storeToRefs(store);
 
     return { multimodal };
   }

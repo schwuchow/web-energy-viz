@@ -7,7 +7,7 @@
 </template>
   
 <script lang="ts">
-import { onMounted, ref, VNodeRef, Ref } from 'vue';
+import { onMounted, ref, VNodeRef, Ref, watch } from 'vue';
 import apartmentImg from '../assets/apartment.svg';
 import { useDevicesStore } from '../store';
 import { storeToRefs } from 'pinia';
@@ -15,8 +15,8 @@ import { storeToRefs } from 'pinia';
 export default {
   setup() {
     const store = useDevicesStore();
-    const { devices, svgContent } = storeToRefs(store);
-    const { deviceIds } = store;
+    const { devices, svgContent, deviceValue } = storeToRefs(store);
+    const { deviceIds, deviceNames } = store;
     const apartment: VNodeRef | null = ref(null);
 
     onMounted(() => {
@@ -31,17 +31,44 @@ export default {
       const svgPos = (svg as HTMLElement).getBoundingClientRect();
       svgContent.value = svg.contentDocument;
 
-      Object.entries(deviceIds).forEach(([_, id]) => {
+      Object.entries(deviceIds).forEach(([key, id]) => {
         let el = (svgContent.value! as HTMLElement).querySelector(`g[id='${id}']`);
 
         const elPos = (el as HTMLElement).getBoundingClientRect();
         elPos.x += svgPos.x;
         elPos.y += svgPos.y;
 
-        devices.value.set((el as HTMLElement).id.replace("#", ""), elPos);
+        const newDevice = {
+          position: elPos,
+          name: deviceNames[key],
+        }
+
+        devices.value.set((el as HTMLElement).id.replace("#", ""), newDevice);
       });
 
       console.log(devices);
+    };
+
+    watch(deviceValue, (value) => {
+      if (value !== null && value.length > 0) setSelectedDevices(value);
+      else {
+        resetUnSelectedDevices(value);
+      }
+    });
+
+    const setSelectedDevices = (value: string[]) => {
+      value.forEach((id: string) => {
+        const deviceEl: HTMLElement | null = (svgContent.value! as HTMLElement).querySelector(`g[id='${id}']`);
+        deviceEl!.style.filter = "brightness(65%)";
+      });
+    };
+
+    const resetUnSelectedDevices = (value: string[]) => {
+      const notFocusedDevices =  Object.values(deviceIds).filter((id) => !value.includes(id));
+      notFocusedDevices.forEach((id: string) => {
+        const deviceEl: HTMLElement | null = (svgContent.value! as HTMLElement).querySelector(`g[id='${id}']`);
+        deviceEl!.style.filter = "brightness(100%)";
+      });
     };
 
     const addWebGazeListener = (): void => {
@@ -91,11 +118,12 @@ export default {
   position: relative;
   background-color: var(--color-light);
   border-radius: 10px;
+  padding-top: 15px;
 
   .apartment__img-container {
     position: absolute;
-    width: 100%;
-    height: 100%;
+    width: 95%;
+    height: 95%;
   }
 
   .apartment__img {
