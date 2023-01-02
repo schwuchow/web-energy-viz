@@ -67,13 +67,16 @@ export default {
 				} else {
 				var timePeriod = checkForTimePeriod(t);
 				var devicesSelected = checkForDevices(t);
-
-                console.log(timePeriod, devicesSelected);
+                var resultsRanked = false;
+                if (t.includes("ranked") || t.includes("ranking") || t.includes("order")){
+                    resultsRanked = true;
+                }
+                console.log(timePeriod, devicesSelected, resultsRanked);
 
 				const newVisualization = {
 					timePeriod: timePeriod,
 					deviceIds: devicesSelected,
-					ranking: false,
+					ranking: resultsRanked,
 				};
 
 				visualization.value = newVisualization;
