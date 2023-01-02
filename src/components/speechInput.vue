@@ -64,11 +64,11 @@ export default {
 			if (t.includes('show me') || t.includes('tell me') || t.includes('energy consumption')) {
 				sr.stop();
 				if (t.includes("the most")){
-					runVisualisation("the MOST", "not implemented");
 				} else {
-					console.log("the MOST usecase - not implemented yet");
 				var timePeriod = checkForTimePeriod(t);
 				var devicesSelected = checkForDevices(t);
+
+                console.log(timePeriod, devicesSelected);
 
 				const newVisualization = {
 					timePeriod: timePeriod,
@@ -95,24 +95,27 @@ export default {
 
 		function checkForDevices(t) {
 			var devicesList = [];
-
+            const { devices } = storeToRefs(store)
 			if (t.includes("all") || t.includes("all devices") || t.includes("old devices")) {
 				devicesList.push("all");
 			}
 			if (t.includes("washing machine")) {
-					devicesList.push(deviceIds.bathroomWashingMashine);
+					devicesList.push(deviceIds.bathroomWashingMashine1);
 			}
 			if (t.includes("dryer")) {
-					devicesList.push(deviceIds.bathroomDryer);
+					devicesList.push(deviceIds.bathroomDryer1);
 			}
 			if (t.includes("dishwasher")) {
-					devicesList.push(deviceIds.kitchenDishWasher);
+					devicesList.push(deviceIds.kitchenDishWasher1);
 			}
 			if (t.includes("freezer")) {
 					devicesList.push(deviceIds.kitchenFreezer);
 			}
 			if (t.includes("refrigerator") || t.includes("fridge")) {
-					devicesList.push(deviceIds.kitchenFridge);
+					devicesList.push(deviceIds.kitchenFridge1);
+			}
+            if (t.includes("coffee") || t.includes("coffee machine")) {
+					devicesList.push(deviceIds.kitchenCoffeeMachine1);
 			}
 			
 			if (devicesList.length === 0) {
@@ -122,12 +125,17 @@ export default {
 			return devicesList;
 		}
 
+        // the big and small dryer
+        // the big and small washing machine
+        // the upper fridge / the lower fridge
+
 		function checkForTimePeriod(t) {
+            var timePeriod = TimePeriod.YESTERDAY;
 			if (t.includes("today")) {
 				timePeriod = TimePeriod.YESTERDAY;
 			} else if (t.includes("yesterday")) {
 				timePeriod = TimePeriod.LAST_WEEK;
-			} else if (t.includes("last week")) {
+			} else if (t.includes("last week") || t.includes("week")) {
 				timePeriod = TimePeriod.LAST_WEEK;
 			} else if (t.includes("last month")) {
 				timePeriod = TimePeriod.LAST_MONTH;

@@ -33,7 +33,7 @@ export const useDevicesStore = defineStore('devices', () => {
     "July", "August", "September", "October", "November", "December"
   ];
 
-  const multimodal: Ref<boolean> = ref(false);
+  const multimodal: Ref<boolean> = ref(true);
 
   const svgContent: Ref<HTMLElement & SVGElement> | Ref<null> = ref(null);
 
