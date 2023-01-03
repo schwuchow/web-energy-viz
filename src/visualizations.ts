@@ -1,4 +1,5 @@
 import * as d3 from "d3";
+import { timeFormat } from "d3-time-format";
 
 export const showHierarchicalBarChart = (data: any, date: string) => {
   console.log(data);
@@ -49,7 +50,7 @@ export const showHierarchicalBarChart = (data: any, date: string) => {
     .attr("y", height + margin.top + 20)
     .style("font-size", "11px")
     .style("font-weight", "bold")
-    .text("Power (Watt)");
+    .text("Power (kW)");
 
 
   // Y axis
@@ -191,7 +192,7 @@ export const showRadialBarChart = (data: any, name: string) => {
       .attr("y", function(d) { return -y(y.ticks(5).pop()!); })
       .attr("dy", "-2.5em")
       .style("fill", "#2E0B49")
-      .text("Energy Consumption (month)");
+      .text("Energy Consumption in kW (month)");
 
   yAxis.append("text")
     .attr("y", function(d) { return -y(y.ticks(5).pop()!); })
@@ -271,14 +272,31 @@ export const showScatterPlotChart = (data: any, deviceIds: string[], date: strin
       .domain(deviceIds)
       .range(d3.schemeSet2);
 
-  const x = d3.scaleLinear()
-    // .domain(data[0].values.map(function(d: any, index: number) { console.log(d.Day); return d.Date }))
-    .domain([0, 31])
+  let sortedDateByDate: any[] = [];
+
+  data.forEach((deviceData: any) => {
+    const sortedValues = deviceData.values.sort(function(obj1: any, obj2: any) {
+      return obj1.Date - obj2.Date;
+    });
+
+    sortedDateByDate.push({ name: deviceData.name, values: sortedValues });
+  });
+
+  const formatDate: any = d3.timeFormat("%d.%m");
+  const minDateDomain = sortedDateByDate[0].values[0].Date;
+  const maxDateDomain = sortedDateByDate[0].values[sortedDateByDate[0].values.length-1].Date;
+
+  const x = d3.scaleUtc()
+    .domain([minDateDomain, maxDateDomain])
     .range([ 0, width ]);
+
+  const xAxis = d3.axisBottom(x)
+    .tickValues(sortedDateByDate[0].values.map((d: any) => d.Date))
+    .tickFormat(formatDate);
 
   svg.append("g")
     .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(x));
+    .call(xAxis);
 
   // Add X axis label:
   svg.append("text")
@@ -303,15 +321,15 @@ export const showScatterPlotChart = (data: any, deviceIds: string[], date: strin
     .attr("y", -margin.left + 50)
     .style("font-size", "11px")
     .style("font-weight", "bold")
-    .text("Power (Watt)");
+    .text("Power (kW)");
 
   // Add the lines
   const line: any = d3.line()
-      .x((d: any) => x(d.Day))
+      .x((d: any) => x(d.Date))
       .y((d: any) => y(d.Value))
 
   svg.selectAll("myLines")
-    .data(data)
+    .data(sortedDateByDate)
     .enter()
     .append("path")
       .attr("d", function(d: any){ return line(d.values) } )
@@ -321,7 +339,7 @@ export const showScatterPlotChart = (data: any, deviceIds: string[], date: strin
 
   // Add the points
   svg.selectAll("myDots")
-  .data(data)
+  .data(sortedDateByDate)
   .enter()
     .append('g')
     .style("fill", function(d: any){ return colors(d.name) })
@@ -332,7 +350,7 @@ export const showScatterPlotChart = (data: any, deviceIds: string[], date: strin
   .append("circle")
     .transition()
     .duration(300)
-    .attr("cx", function(d: any) { return x(d.Day) } )
+    .attr("cx", function(d: any) { return x(d.Date) } )
     .attr("cy", function(d: any) { return y(d.Value) } )
     .attr("r", 4)
     .attr("stroke", "white")
@@ -342,14 +360,14 @@ export const showScatterPlotChart = (data: any, deviceIds: string[], date: strin
   // Add a legend at the end of each line
   svg
     .selectAll("myLabels")
-    .data(data)
+    .data(sortedDateByDate)
     .enter()
       .append('g')
       .append("text")
         // keep only the last value of each time series
         .datum(function(d: any) { return {name: d.name, value: d.values[d.values.length - 1]}; })
         // Put the text at the position of the last point
-        .attr("transform", function(d) { return "translate(" + x(d.value.Day) + "," + y(d.value.Value) + ")"; })
+        .attr("transform", function(d) { return "translate(" + x(d.value.Date) + "," + y(d.value.Value) + ")"; })
         .attr("x", 12) // shift the text a bit more right
         .text(function(d) { return d.name; })
         .style("fill", function(d){ return colors(d.name) })
@@ -401,7 +419,7 @@ export const showSinglePointData = (data: any, date: string) => {
       .attr("class", "device-text")
       .attr("transform", "translate(10,50)")
       .attr("y", function(d: any, index: number) { return 40 * (index + 1) })
-      .text(function(d: any) { return `${d.name}: ${d.Value} Watt` });
+      .text(function(d: any) { return `${d.name}: ${d.Value} kW` });
 }
 
 const resetVisualization = () => {
