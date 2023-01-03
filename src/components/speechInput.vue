@@ -153,9 +153,9 @@ export default {
     display: flex;
     align-items: center;
     font-size: 20px;
-    padding-left: 50px;
     background-color: var(--color-tertiary);
     margin: 30px 0;
+		padding: 10px 0 10px 50px;
 
     #speech-input__icon-wave {
       width: 25px;

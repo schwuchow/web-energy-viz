@@ -93,7 +93,7 @@ export default {
               name: name,
               values: dataset.filter((d: any, index: number) => {
                 if (inTimeFrame(time, index)) return d;
-              }).map((d: any) => ({ Day: d.Day, Value: d[id] }))
+              }).map((d: any) => ({ Day: d.Day, Value: d[id], Date: createDate(time, parseInt(d.Day)) }))
             };
         });
 
@@ -146,6 +146,24 @@ export default {
           return 31;
         default: return today;
       };
+    };
+
+    const createDate = (timObj: TimeFrame, day: number): Date => {
+      let newDate;
+
+      if (timObj.endDate < timObj.startDate) {
+        if (timObj.startDate < day) {
+          newDate = new Date(date.value.year, date.value.month -1, day);
+        } else {
+          newDate = new Date(date.value.year, date.value.month, day);
+        }
+      } else {
+        newDate = new Date(date.value.year, date.value.month, day);
+      }
+
+      console.log(newDate);
+
+      return newDate;
     };
 
     const inTimeFrame = (timeObj: TimeFrame, index: number): boolean => {
