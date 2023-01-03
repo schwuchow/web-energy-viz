@@ -15,3 +15,9 @@ export interface TimeFrame {
   startDate: number,
   endDate: number,
 }
+
+export interface CustomDate {
+  day: number,
+  month: number,
+  year: number,
+}

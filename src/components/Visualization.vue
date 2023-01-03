@@ -9,7 +9,7 @@
 </template>
   
 <script lang="ts">
-import { onMounted, watch } from 'vue';
+import { watch } from 'vue';
 import { useDevicesStore } from '../store';
 import { storeToRefs } from 'pinia';
 import { showHierarchicalBarChart, showRadialBarChart, showScatterPlotChart, showSinglePointData  } from '../visualizations';
@@ -21,18 +21,7 @@ import dataset from '../datasets/data.csv';
 export default {
   setup() {
     const store = useDevicesStore();
-		const { devices, visualization } = storeToRefs(store);
-
-    onMounted(() => {
-      getCurrentDay();
-    });
-
-    const getCurrentDay = (): number => {
-      const today = new Date(Date.now());
-      const dayOfToday = today.getDate();
-      console.log("Today's day: ", dayOfToday);
-      return dayOfToday;
-    };
+		const { devices, visualization, date } = storeToRefs(store);
 
     watch(visualization, (value) => {
       if (value !== null) setVisualization(value);
@@ -61,7 +50,7 @@ export default {
             const day = dataset.find((d: any) => {
               return parseInt(d.Day) === time
             });
-            const sum = parseInt(day[id]);
+            const sum = kiloWatt(day[id]);
             data.push({ sum, name });
           }
         })
@@ -81,7 +70,7 @@ export default {
         deviceIds.forEach((id: string) => {
           const name = devices.value.get(id)?.name;
 
-          data.push({ id, name, Value:  dayData[0][id] });
+          data.push({ id, name, Value:  kiloWatt(dayData[0][id]) });
         });
 
         showSinglePointData(data, visualization.timePeriod);
@@ -89,7 +78,7 @@ export default {
       } else if (rules.hasOneDeviceAndOneMonthPeriod) {
         const deviceId = visualization.deviceIds[0];
         const name = devices.value.get(deviceId)?.name;
-        var data = dataset.map((d: any) => ({ Day: d.Day, Value: d[deviceId] }));
+        var data = dataset.map((d: any) => ({ Day: d.Day, Value: kiloWatt(d[deviceId]) }));
 
         showRadialBarChart(data, name!);
 
@@ -116,7 +105,7 @@ export default {
       const deviceData = dataset.map((d: any) => d[id]);
       const initialValue = 0;
       const sum = deviceData.reduce(
-        (accumulator: number, currentValue: string) => accumulator + parseInt(currentValue),
+        (accumulator: number, currentValue: string) => accumulator + kiloWatt(currentValue),
         initialValue
       );
 
@@ -124,7 +113,7 @@ export default {
     };
 
     const timeFrame = (timePeriod: TimePeriod): number | TimeFrame => {
-      const today = getCurrentDay();
+      const today = date.value.day;
 
       switch(timePeriod) {
         case TimePeriod.TODAY:
@@ -162,6 +151,10 @@ export default {
     const inTimeFrame = (timeObj: TimeFrame, index: number): boolean => {
         const { startDate, endDate } = timeObj;
         return index >= startDate || index < endDate;
+    };
+
+    const kiloWatt = (value: string) => {
+      return  Math.round(+value / 1000);
     };
 
     return { visualization };

@@ -2,7 +2,7 @@
 <div class="video-feed col-3">
   <h1>Home</h1>
   <div class="video-feed__status">
-    <div class="video-feed__status-date">{{  date }}</div>
+    <div class="video-feed__status-date">{{  dateAndTime }}</div>
     <img :src="weatherImg" id="appliances__house-icon" class="icon" />
   </div>
 </div>
@@ -11,11 +11,13 @@
 <script lang="ts">
 import weatherImg from '../assets/weather.svg';
 import { useDevicesStore } from '../store';
+import { storeToRefs } from 'pinia';
 
 export default {
   setup() {
     const store = useDevicesStore();
     const { monthNames } = store;
+    const { date } = storeToRefs(store);
 
     const getCurrentDayAndTime = (): string => {
       const today = new Date(Date.now());
@@ -24,12 +26,16 @@ export default {
       const hoursOfToday = today.getHours();
       const minutesOfToday = today.getMinutes();
 
+      date.value.day = dayOfToday;
+      date.value.month = today.getMonth();
+      date.value.year = today.getFullYear();
+
       return `${dayOfToday} ${monthOfToday} • ${hoursOfToday}:${minutesOfToday}`;
     };
 
-    const date = getCurrentDayAndTime();
+    const dateAndTime = getCurrentDayAndTime();
 
-    return { date, weatherImg };
+    return { dateAndTime, weatherImg };
   }
 }
 </script>

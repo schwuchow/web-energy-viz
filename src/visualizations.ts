@@ -49,7 +49,7 @@ export const showHierarchicalBarChart = (data: any, date: string) => {
     .attr("y", height + margin.top + 20)
     .style("font-size", "11px")
     .style("font-weight", "bold")
-    .text("Power (Watt)");
+    .text("Power (kW)");
 
 
   // Y axis
@@ -191,7 +191,7 @@ export const showRadialBarChart = (data: any, name: string) => {
       .attr("y", function(d) { return -y(y.ticks(5).pop()!); })
       .attr("dy", "-2.5em")
       .style("fill", "#2E0B49")
-      .text("Energy Consumption (month)");
+      .text("Energy Consumption in kW (month)");
 
   yAxis.append("text")
     .attr("y", function(d) { return -y(y.ticks(5).pop()!); })
@@ -303,7 +303,7 @@ export const showScatterPlotChart = (data: any, deviceIds: string[], date: strin
     .attr("y", -margin.left + 50)
     .style("font-size", "11px")
     .style("font-weight", "bold")
-    .text("Power (Watt)");
+    .text("Power (kW)");
 
   // Add the lines
   const line: any = d3.line()
@@ -401,7 +401,7 @@ export const showSinglePointData = (data: any, date: string) => {
       .attr("class", "device-text")
       .attr("transform", "translate(10,50)")
       .attr("y", function(d: any, index: number) { return 40 * (index + 1) })
-      .text(function(d: any) { return `${d.name}: ${d.Value} Watt` });
+      .text(function(d: any) { return `${d.name}: ${d.Value} kW` });
 }
 
 const resetVisualization = () => {

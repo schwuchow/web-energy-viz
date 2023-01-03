@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, Ref } from 'vue';
-import {  Device, Visualization } from './types/interfaces';
+import {  Device, Visualization, CustomDate } from './types/interfaces';
 
 export const useDevicesStore = defineStore('devices', () => {
   const deviceIds = {
@@ -41,5 +41,7 @@ export const useDevicesStore = defineStore('devices', () => {
   const deviceValue: Ref<string[]> = ref([]);
   const visualization: Ref<Visualization> | Ref<null> = ref(null);
 
-  return { deviceIds, deviceValue, deviceNames, devices, visualization, svgContent, multimodal, monthNames };
+  const date: Ref<CustomDate> = ref({ day: 0, month: 0, year: 0});
+
+  return { deviceIds, deviceValue, deviceNames, devices, visualization, svgContent, multimodal, monthNames, date };
 });
