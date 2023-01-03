@@ -3,7 +3,15 @@
   <h2>Instructions</h2>
   <div class="instructions__text">
     <template v-if="multimodal">
-      Say "Hi, my home" to evoke speech
+      <div class="instructions__text-headline">To view the <b>energy consumption</b> of this apartment:</div>
+      <div>1. Click on <img :src="voiceWaveImg" id="instructions__icon-wave" class="icon" /> to activate the speech recognition.</div>
+      <div>2. Look on a device for <b>2 seconds</b>.</div>
+      <div>3. Say "Show me" with the <b>device</b> and <b>time frame</b> you want.</div>
+      <div class="instructions___speech-options">
+        D: <b>all devices | washing machine 1 | ...</b>
+        <br>
+        T: <b>today | last week | last month | ...</b>
+      </div>
     </template>
     <template v-else>
       <div class="instructions__text-headline">To view the <b>energy consumption</b> of this apartment:</div>
@@ -20,13 +28,14 @@
 <script lang="ts">
 import { useDevicesStore } from '../store';
 import { storeToRefs } from 'pinia';
+import voiceWaveImg from '../assets/voice_wave.svg';
 
 export default {
   setup() {
     const store = useDevicesStore();
 		const { multimodal } = storeToRefs(store);
 
-    return { multimodal };
+    return { multimodal, voiceWaveImg };
   }
 };
 </script>
@@ -46,6 +55,12 @@ export default {
     margin-top: 5px;
     font-size: 13px;
     text-decoration: underline;
+  }
+
+  #instructions__icon-wave {
+    width: 16px;
+    height: 16px;
+    margin-bottom: -5px;
   }
 
 
