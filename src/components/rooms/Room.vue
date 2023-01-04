@@ -1,5 +1,5 @@
 <template>
-<div class="room" :class="{selected: isSelected}" @click="toggleSelected">
+<div class="room" :id="id" :class="{selected: isSelected}" @click="toggleSelected">
   <div>
     <img :src="img" id="room__icon" class="icon" />
     <p class="room__text">{{ title }}</p>
@@ -33,6 +33,7 @@ export default {
     const store = useDevicesStore();
 		const { deviceValue } = storeToRefs(store);
     const { deviceIds } = store;
+    const id = props.title?.replace(" ", "-").toLowerCase();
 
     onMounted(() => {
     });
@@ -59,7 +60,7 @@ export default {
       }
     };
 
-    return { allDevices, isSelected, toggleSelected };
+    return { allDevices, isSelected, toggleSelected, id };
   }
 }
 </script>

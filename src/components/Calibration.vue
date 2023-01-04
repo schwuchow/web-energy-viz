@@ -36,6 +36,7 @@
       <input type="button" class="Calibration" id="Pt7" />
       <input type="button" class="Calibration" id="Pt8" />
       <input type="button" class="Calibration" id="Pt9" />
+      <div id="Accuracy"><a>Not yet Calibrated</a></div>
     </div>
 
     <div id="helpModal" class="modal fade" role="dialog">
@@ -84,7 +85,7 @@ export default {
     const addWebGazeListener = async (): Promise<any> => {
       //start the webgazer tracker
       //  @ts-ignore
-      await webgazer.setRegression('ridge') /* currently must set regression and tracker */
+      await webgazer.setRegression('weightedRidge') /* currently must set regression and tracker */
           //.setTracker('clmtrackr')
           .setGazeListener(function(data: any, clock: any) {
             //   console.log(data); /* data is an object containing an x and y key which are the x and y prediction coordinates (no bounds limiting) */
@@ -150,7 +151,7 @@ export default {
           var past50 = webgazer.getStoredPoints(); // retrieve the stored points
           var precision_measurement = calculatePrecision(past50);
           var accuracyLabel = "<a>Accuracy | "+precision_measurement+"%</a>";
-          // document.getElementById("Accuracy")!.innerHTML = accuracyLabel;
+          document.getElementById("Accuracy")!.innerHTML = accuracyLabel;
           console.log(past50);
           console.log("Accuracy: ", precision_measurement);
 
@@ -283,6 +284,12 @@ export default {
   left: 130px;
 }
 
+#Accuracy {
+  position: absolute;
+  bottom: 45%;
+  right: 45%;
+}
+
 #Pt1 {
   position: absolute;
   top: 0;
@@ -303,7 +310,7 @@ export default {
 
 #Pt4 {
   position: absolute;
-  bottom: 0;
+  bottom: 40px;
   right: 40px;
 }
 
@@ -315,13 +322,13 @@ export default {
 
 #Pt6 {
   position: absolute;
-  bottom: 0;
+  bottom: 40px;
   right: 50%;
 }
 
 #Pt7 {
   position: absolute;
-  bottom: 0;
+  bottom: 40px;
   left: 0;
 }
 

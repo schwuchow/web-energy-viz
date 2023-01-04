@@ -15,15 +15,21 @@ import { storeToRefs } from 'pinia';
 export default {
   setup() {
     const store = useDevicesStore();
-    const { devices, svgContent, deviceValue } = storeToRefs(store);
+    const { devices, svgContent, deviceValue, multimodal, focusedDevices, rooms } = storeToRefs(store);
     const { deviceIds, deviceNames } = store;
     const apartment: VNodeRef | null = ref(null);
+    let timer = 0;
 
     onMounted(() => {
       console.log("MOUNTED");
 
-      addWebGazeListener();
-      setTimeout(() => buildDevicesMap(), 1000);
+      if (multimodal) {
+        addWebGazeListener();
+        setTimeout(() => buildDevicesMap(), 1000);
+        buildRoomsMap();
+      } else {
+        buildDevicesMap();
+      }
     })
 
     const buildDevicesMap = (): void => {
@@ -44,6 +50,22 @@ export default {
         }
 
         devices.value.set((el as HTMLElement).id.replace("#", ""), newDevice);
+      });
+
+      console.log(devices);
+    };
+
+    const buildRoomsMap = (): void => {
+      Object.entries(["all-rooms", "kitchen", "bathroom"]).forEach(([key, id]) => {
+        let el = document.querySelector(`#${id}`);
+
+        const elPos = (el as HTMLElement).getBoundingClientRect();
+
+        let newRoom = {
+          position: elPos,
+        }
+
+        rooms.value.set((el as HTMLElement).id.replace("#", ""), newRoom);
       });
 
       console.log(devices);
@@ -73,18 +95,18 @@ export default {
 
     const addWebGazeListener = (): void => {
       // @ts-ignore
-      let newWebgazer = webgazer.applyKalmanFilter(true);
+      let configuredWebGazer = webgazer.applyKalmanFilter(true);
       // trackers: 'clmtrackr', 'js_objectdetect', 'trackingjs' -> but according to website & JS console only Mediapipe TFFacemesh valid tracker
       // @ts-ignore
-      newWebgazer = webgazer.setTracker('TFFacemesh');
+      configuredWebGazer = webgazer.setTracker('TFFacemesh');
       // regression models: ‘ridge’, ‘weightedRidge', 'threadedRidge' -> threadedRidge not working
       // @ts-ignore
-      newWebgazer = webgazer.setRegression('weightedRidge');
+      configuredWebGazer = webgazer.setRegression('weightedRidge');
       // @ts-ignore
-      console.log(newWebgazer.getTracker());
-      console.log(newWebgazer.getRegression());
+      console.log(configuredWebGazer.getTracker());
+      console.log(configuredWebGazer.getRegression());
 
-      newWebgazer.setGazeListener(function(data: { x: any; y: any; }|null, elapsedTime: any) {
+      configuredWebGazer.setGazeListener(function(data: { x: any; y: any; }|null, elapsedTime: any) {
         if (data == null) {
             return;
         }
@@ -92,37 +114,61 @@ export default {
         let yprediction = data.y; //these y coordinates are relative to the viewport
         // console.log(elapsedTime); //elapsed time is based on time since begin was called
         // console.log(xprediction, yprediction); //elapsed time is based on time since begin was called
-        hasEyeFocus(xprediction, yprediction);
+        hasEyeFocusOnDevice(xprediction, yprediction);
+        hasEyeFocusOnRoom(xprediction, yprediction);
+
+        timer += 1;
+
+        if (timer === 200) {
+          console.log("TIMER RESET");
+          timer = 0;
+          focusedDevices.value = [];
+        }
       })
       .saveDataAcrossSessions(true)
       .begin();
-
-      // console.log(localforage);
-      // localforage.getItem('webgazerGlobalData').then(function(value) {
-      //   console.log(value);
-      // });
     };
 
-    const hasEyeFocus = (xPred: number, yPred: number) => {
+    const hasEyeFocusOnDevice = (xPred: number, yPred: number) => {
       devices.value.forEach((device, id) => {
         const focused: Ref<boolean> = ref(false);
         const deviceEl: HTMLElement | null = (svgContent.value! as HTMLElement).querySelector(`g[id='${id}']`);
 
-        focused.value = calcFocus(xPred, yPred, device);
+        focused.value = calcFocus(xPred, yPred, device, 50);
 
         if (focused.value) {
-          console.log(`${id} FOCUS`);
-          console.log(deviceEl);
           deviceEl!.style.filter = "brightness(65%)";
+          focusedDevices.value.shift();
+          focusedDevices.value.push(id);
+
+          console.log(focusedDevices.value);
         } else {
           deviceEl!.style.filter = "brightness(100%)";
-      }
+        }
       });
     };
 
-    const calcFocus = (xPred: number, yPred: number, device: any) => {
-      return xPred >= device.x && xPred <= (device.x + device.width) &&
-        yPred >= device.y && yPred <= (device.y + device.height);
+    const hasEyeFocusOnRoom = (xPred: number, yPred: number) => {
+      rooms.value.forEach((room, id) => {
+        const focused: Ref<boolean> = ref(false);
+        const roomEl: HTMLElement | null = document.querySelector(`#${id}`);
+
+        focused.value = calcFocus(xPred, yPred, room);
+
+        if (focused.value) {
+          roomEl!.style.filter = "brightness(65%)";
+          focusedDevices.value.push(id);
+
+          console.log(focusedDevices.value);
+        } else {
+          roomEl!.style.filter = "brightness(100%)";
+        }
+      })
+    };
+
+    const calcFocus = (xPred: number, yPred: number, el: any, range: number = 0) => {
+      return xPred >= el.position.left - range && xPred <= el.position.right + range &&
+        yPred >= el.position.bottom - range  && yPred <= el.position.top + range;
     };
 
     return { apartmentImg, apartment };
