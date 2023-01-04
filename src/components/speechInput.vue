@@ -198,12 +198,12 @@ export default {
 .speech-input {
   grid-row: span 1;
   background-color: var(--color-light);
-  border-radius: 10px;
+  border-radius: 10px 10px 0 0;
 
   .speech-input__bar {
     height: 50px;
     margin: auto;
-    color: var(--color-secondary);
+    color: var(--color-primary);
     display: flex;
     align-items: center;
     font-size: 20px;
