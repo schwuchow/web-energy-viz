@@ -64,16 +64,19 @@ export default {
 			if (t.includes('show me') || t.includes('tell me') || t.includes('energy consumption')) {
 				sr.stop();
 				if (t.includes("the most")){
-					runVisualisation("the MOST", "not implemented");
 				} else {
-					console.log("the MOST usecase - not implemented yet");
 				var timePeriod = checkForTimePeriod(t);
 				var devicesSelected = checkForDevices(t);
+                var resultsRanked = false;
+                if (t.includes("ranked") || t.includes("ranking") || t.includes("order")){
+                    resultsRanked = true;
+                }
+                console.log(timePeriod, devicesSelected, resultsRanked);
 
 				const newVisualization = {
 					timePeriod: timePeriod,
 					deviceIds: devicesSelected,
-					ranking: false,
+					ranking: resultsRanked,
 				};
 
 				visualization.value = newVisualization;
@@ -95,24 +98,68 @@ export default {
 
 		function checkForDevices(t) {
 			var devicesList = [];
-
+            const { devices } = storeToRefs(store)
 			if (t.includes("all") || t.includes("all devices") || t.includes("old devices")) {
-				devicesList.push("all");
+                if (t.includes("from the kitchen") || t.includes("kitchen")) {
+                devicesList.push(deviceIds.kitchenDishWasher1);
+                devicesList.push(deviceIds.kitchenDishWasher2);
+                devicesList.push(deviceIds.kitchenFridge1);
+                devicesList.push(deviceIds.kitchenFridge2);
+                devicesList.push(deviceIds.kitchenCoffeeMachine1);
+                devicesList.push(deviceIds.kitchenCoffeeMachine2);
+			    }else if (t.includes("bathroom") || t.includes("from the bathroom")) {
+                devicesList.push(deviceIds.bathroomWashingMashine1);
+                devicesList.push(deviceIds.bathroomWashingMashine2);
+                devicesList.push(deviceIds.bathroomDryer1);
+                devicesList.push(deviceIds.bathroomDryer2);
+			    }else{
+                devicesList.push(deviceIds.kitchenDishWasher1);
+                devicesList.push(deviceIds.kitchenDishWasher2);
+                devicesList.push(deviceIds.kitchenFridge1);
+                devicesList.push(deviceIds.kitchenFridge2);
+                devicesList.push(deviceIds.kitchenCoffeeMachine1);
+                devicesList.push(deviceIds.kitchenCoffeeMachine2);
+                devicesList.push(deviceIds.bathroomWashingMashine1);
+                devicesList.push(deviceIds.bathroomWashingMashine2);
+                devicesList.push(deviceIds.bathroomDryer1);
+                devicesList.push(deviceIds.bathroomDryer2);
+                }
 			}
 			if (t.includes("washing machine")) {
-					devicesList.push(deviceIds.bathroomWashingMashine);
+					devicesList.push(deviceIds.bathroomWashingMashine1);
 			}
 			if (t.includes("dryer")) {
-					devicesList.push(deviceIds.bathroomDryer);
+                if(t.includes("the small") || t.includes("smaller")){
+                    devicesList.push(deviceIds.bathroomDryer2);
+                }else if(t.includes("both dryers")){
+                    devicesList.push(deviceIds.bathroomDryer1);
+                    devicesList.push(deviceIds.bathroomDryer2);
+                }else{
+                    devicesList.push(deviceIds.bathroomDryer1);
+                }
 			}
 			if (t.includes("dishwasher")) {
-					devicesList.push(deviceIds.kitchenDishWasher);
+                if(t.includes("next to the sink") || t.includes("left of the sink")){
+                    devicesList.push(deviceIds.kitchenDishWasher2);
+                }else{
+                    devicesList.push(deviceIds.kitchenDishWasher1);
+                }
 			}
 			if (t.includes("freezer")) {
 					devicesList.push(deviceIds.kitchenFreezer);
 			}
 			if (t.includes("refrigerator") || t.includes("fridge")) {
-					devicesList.push(deviceIds.kitchenFridge);
+                if(t.includes("upper") || t.includes("left")){
+					devicesList.push(deviceIds.kitchenFridge2);
+                }else if(t.includes("both fridges")){
+                    devicesList.push(deviceIds.kitchenFridge1);
+                    devicesList.push(deviceIds.kitchenFridge2);
+                }else{
+                    devicesList.push(deviceIds.kitchenFridge1);
+                }
+			}
+            if (t.includes("coffee") || t.includes("coffee machine")) {
+					devicesList.push(deviceIds.kitchenCoffeeMachine1);
 			}
 			
 			if (devicesList.length === 0) {
@@ -122,12 +169,17 @@ export default {
 			return devicesList;
 		}
 
+        // the big and small dryer
+        // the big and small washing machine
+        // the upper fridge / the lower fridge
+
 		function checkForTimePeriod(t) {
+            var timePeriod = TimePeriod.YESTERDAY;
 			if (t.includes("today")) {
 				timePeriod = TimePeriod.YESTERDAY;
 			} else if (t.includes("yesterday")) {
 				timePeriod = TimePeriod.LAST_WEEK;
-			} else if (t.includes("last week")) {
+			} else if (t.includes("last week") || t.includes("week")) {
 				timePeriod = TimePeriod.LAST_WEEK;
 			} else if (t.includes("last month")) {
 				timePeriod = TimePeriod.LAST_MONTH;
