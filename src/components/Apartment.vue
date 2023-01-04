@@ -22,7 +22,7 @@ export default {
     onMounted(() => {
       console.log("MOUNTED");
 
-      // addWebGazeListener();
+      addWebGazeListener();
       setTimeout(() => buildDevicesMap(), 1000);
     })
 
@@ -86,25 +86,39 @@ export default {
     };
 
     const hasEyeFocus = (xPred: number, yPred: number) => {
+      let i = 0; 
       devices.value.forEach((device, id) => {
+        let trueDevice =[]; 
         const focused: Ref<boolean> = ref(false);
         const deviceEl: HTMLElement | null = (svgContent.value! as HTMLElement).querySelector(`g[id='${id}']`);
-
+   
         focused.value = calcFocus(xPred, yPred, device);
 
         if (focused.value) {
-          console.log(`${id} FOCUS`);
-          console.log(deviceEl);
           deviceEl!.style.filter = "brightness(65%)";
-        } else {
-          deviceEl!.style.filter = "brightness(100%)";
-      }
+          trueDevice[i] = deviceEl; 
+          if(trueDevice[i]==trueDevice[i-1]){
+               // @ts-ignore
+            webgazer.stop(); 
+          }
+          else{
+            // @ts-ignore
+           webgazer.resume(); 
+          }
+        } 
+        
+        else {
+         deviceEl!.style.filter = "brightness(100%)";
+      }   
+      i++; 
       });
     };
+    
+     const calcFocus = (xPred: number, yPred: number, device: any) => { 
+      const range = 50; 
 
-    const calcFocus = (xPred: number, yPred: number, device: any) => {
-      return xPred >= device.x && xPred <= (device.x + device.width) &&
-        yPred >= device.y && yPred <= (device.y + device.height);
+      return xPred >= device.position.left - range && xPred <= device.position.right + range &&
+        yPred >= device.position.bottom - range  && yPred <= device.position.top + range;
     };
 
     return { apartmentImg, apartment };
