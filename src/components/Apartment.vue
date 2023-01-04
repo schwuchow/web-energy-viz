@@ -11,6 +11,7 @@ import { onMounted, ref, VNodeRef, Ref, watch } from 'vue';
 import apartmentImg from '../assets/apartment.svg';
 import { useDevicesStore } from '../store';
 import { storeToRefs } from 'pinia';
+import localforage from 'localforage';
   
 export default {
   setup() {
@@ -22,7 +23,7 @@ export default {
     onMounted(() => {
       console.log("MOUNTED");
 
-      // addWebGazeListener();
+      addWebGazeListener();
       setTimeout(() => buildDevicesMap(), 1000);
     })
 
@@ -73,7 +74,18 @@ export default {
 
     const addWebGazeListener = (): void => {
       // @ts-ignore
-      webgazer.setGazeListener(function(data: { x: any; y: any; }|null, elapsedTime: any) {
+      let newWebgazer = webgazer.applyKalmanFilter(true);
+      // trackers: 'clmtrackr', 'js_objectdetect', 'trackingjs' -> but according to website & JS console only Mediapipe TFFacemesh valid tracker
+      // @ts-ignore
+      newWebgazer = webgazer.setTracker('TFFacemesh');
+      // regression models: ‘ridge’, ‘weightedRidge', 'threadedRidge' -> threadedRidge not working
+      // @ts-ignore
+      newWebgazer = webgazer.setRegression('weightedRidge');
+      // @ts-ignore
+      console.log(newWebgazer.getTracker());
+      console.log(newWebgazer.getRegression());
+
+      newWebgazer.setGazeListener(function(data: { x: any; y: any; }|null, elapsedTime: any) {
         if (data == null) {
             return;
         }
@@ -83,6 +95,11 @@ export default {
         // console.log(xprediction, yprediction); //elapsed time is based on time since begin was called
         hasEyeFocus(xprediction, yprediction);
       }).begin();
+
+      // console.log(localforage);
+      // localforage.getItem('webgazerGlobalData').then(function(value) {
+      //   console.log(value);
+      // });
     };
 
     const hasEyeFocus = (xPred: number, yPred: number) => {

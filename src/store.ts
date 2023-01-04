@@ -33,7 +33,8 @@ export const useDevicesStore = defineStore('devices', () => {
     "July", "August", "September", "October", "November", "December"
   ];
 
-  const multimodal: Ref<boolean> = ref(true);
+  const multimodal: Ref<boolean> = ref(false);
+  const calibration: Ref<boolean> = ref(true);
 
   const svgContent: Ref<HTMLElement & SVGElement> | Ref<null> = ref(null);
 
@@ -43,5 +44,5 @@ export const useDevicesStore = defineStore('devices', () => {
 
   const date: Ref<CustomDate> = ref({ day: 0, month: 0, year: 0});
 
-  return { deviceIds, deviceValue, deviceNames, devices, visualization, svgContent, multimodal, monthNames, date };
+  return { deviceIds, deviceValue, deviceNames, devices, visualization, svgContent, multimodal, monthNames, date, calibration };
 });

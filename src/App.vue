@@ -1,5 +1,9 @@
 <template>
-<div class="grid">
+<template v-if="calibration">
+ <Calibration />
+</template>
+<template v-else>
+  <div class="grid">
   <VideoFeed />
   <template v-if="multimodal">
     <SpeechInput />
@@ -13,6 +17,7 @@
   <Rooms />
 </div>
 </template>
+</template>
 
 <script lang="ts">
 import Instructions from './components/Instructions.vue';
@@ -22,6 +27,7 @@ import Visualization from './components/Visualization.vue';
 import Apartment from './components/Apartment.vue';
 import MouseInput from './components/MouseInput.vue';
 import SpeechInput from './components/SpeechInput.vue';
+import Calibration from './components/Calibration.vue';
 import { useDevicesStore } from './store';
 import { storeToRefs } from 'pinia';
 
@@ -34,12 +40,13 @@ export default {
     Apartment,
     MouseInput,
     SpeechInput,
+    Calibration,
   },
   setup() {
     const store = useDevicesStore();
-		const { multimodal } = storeToRefs(store);
+		const { multimodal, calibration } = storeToRefs(store);
 
-    return { multimodal };
+    return { multimodal, calibration };
   }
 };
 </script>
