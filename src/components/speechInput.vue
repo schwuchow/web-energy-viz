@@ -18,7 +18,7 @@ export default {
   setup() {
 		const store = useDevicesStore();
 		const { deviceIds } = store;
-		const { visualization } = storeToRefs(store);
+		const { visualization, focusedDevices } = storeToRefs(store);
 		const transcript = ref('Ask me something about your devices energy consumption!');
 		const isRecording = ref(false);
 		const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -163,7 +163,10 @@ export default {
 			}
 			
 			if (devicesList.length === 0) {
-			devicesList.push(0);
+                focusedDevices.value.forEach(device => {
+                devicesList.push(device);
+            });
+			
 			}
 
 			return devicesList;
@@ -172,8 +175,7 @@ export default {
         // the big and small dryer
         // the big and small washing machine
         // the upper fridge / the lower fridge
-
-		function checkForTimePeriod(t) {
+    function checkForTimePeriod(t) {
             var timePeriod = TimePeriod.YESTERDAY;
 			if (t.includes("today")) {
 				timePeriod = TimePeriod.YESTERDAY;
@@ -207,7 +209,7 @@ export default {
     font-size: 20px;
     background-color: var(--color-tertiary);
     margin: 30px 0;
-		padding: 10px 0 10px 50px;
+    padding: 10px 0 10px 50px;
 
     #speech-input__icon-wave {
       width: 25px;
