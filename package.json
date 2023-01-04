@@ -12,6 +12,7 @@
     "@vueform/multiselect": "^2.5.8",
     "d3": "^7.8.0",
     "d3-time-format": "^4.1.0",
+    "localforage": "^1.10.0",
     "npm": "^9.2.0",
     "pinia": "^2.0.28",
     "vue": "^3.2.45",

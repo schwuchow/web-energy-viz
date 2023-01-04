@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, Ref } from 'vue';
-import {  Device, Visualization, CustomDate } from './types/interfaces';
+import {  Device, Visualization, CustomDate, Room } from './types/interfaces';
 
 export const useDevicesStore = defineStore('devices', () => {
   const deviceIds = {
@@ -34,14 +34,17 @@ export const useDevicesStore = defineStore('devices', () => {
   ];
 
   const multimodal: Ref<boolean> = ref(true);
+  const calibration: Ref<boolean> = ref(false);
 
   const svgContent: Ref<HTMLElement & SVGElement> | Ref<null> = ref(null);
 
   const devices: Ref<Map<string, Device>> = ref(new Map());
+  const rooms: Ref<Map<string, Room>> = ref(new Map());
   const deviceValue: Ref<string[]> = ref([]);
   const visualization: Ref<Visualization> | Ref<null> = ref(null);
 
   const date: Ref<CustomDate> = ref({ day: 0, month: 0, year: 0});
+  const focusedDevices: Ref<string[]> = ref([]);
 
-  return { deviceIds, deviceValue, deviceNames, devices, visualization, svgContent, multimodal, monthNames, date };
+  return { deviceIds, deviceValue, deviceNames, devices, visualization, svgContent, multimodal, monthNames, date, calibration, focusedDevices, rooms };
 });

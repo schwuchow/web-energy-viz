@@ -11,6 +11,10 @@ export interface Device {
   name: string,
 }
 
+export interface Room {
+  position: DOMRect,
+}
+
 export interface TimeFrame {
   startDate: number,
   endDate: number,
