@@ -85,12 +85,21 @@ export default {
       console.log(devices);
     };
 
-    watch(deviceValue, (value) => {
-      if (value !== null && value.length > 0) setSelectedDevices(value);
-      else {
-        resetUnSelectedDevices(value);
-      }
-    });
+    if (multimodal) {
+      watch(focusedDevicesNames, (value) => {
+        if (value !== null && value.length > 0) setSelectedDevices(value);
+        else {
+          resetUnSelectedDevices(value);
+        }
+      });
+    } else {
+      watch(deviceValue, (value) => {
+        if (value !== null && value.length > 0) setSelectedDevices(value);
+        else {
+          resetUnSelectedDevices(value);
+        }
+      });
+    }
 
     const setSelectedDevices = (value: string[]) => {
       value.forEach((id: string) => {
@@ -111,14 +120,9 @@ export default {
       // @ts-ignore
       let configuredWebGazer = webgazer.applyKalmanFilter(true);
       // trackers: 'clmtrackr', 'js_objectdetect', 'trackingjs' -> but according to website & JS console only Mediapipe TFFacemesh valid tracker
-      // @ts-ignore
-      configuredWebGazer = webgazer.setTracker('TFFacemesh');
       // regression models: ‘ridge’, ‘weightedRidge', 'threadedRidge' -> threadedRidge not working
       // @ts-ignore
       configuredWebGazer = webgazer.setRegression('weightedRidge');
-      // @ts-ignore
-      console.log(configuredWebGazer.getTracker());
-      console.log(configuredWebGazer.getRegression());
 
       configuredWebGazer.setGazeListener(function(data: { x: any; y: any; }|null, elapsedTime: any) {
         if (data == null) {
@@ -155,17 +159,12 @@ export default {
         if (focused.value) {
           deviceEl!.style.filter = "brightness(65%)";
 
-          if (focusedDevices.value.length > 1) {
-            focusedDevices.value = [];
-          } else {
-            focusedDevices.value.shift();
-          }
-
-          focusedDevices.value.push(id);
-
-          console.log(focusedDevices.value);
+          const isFocusedDevice = focusedDevices.value.find(deviceId => deviceId === id);
+          if (!isFocusedDevice) focusedDevices.value.push(id);
         } else {
-          deviceEl!.style.filter = "brightness(100%)";
+          const isFocusedDevice = focusedDevices.value.find(deviceId => deviceId === id);
+
+          if (!isFocusedDevice) deviceEl!.style.filter = "brightness(100%)";
         }
       });
     };
@@ -179,19 +178,15 @@ export default {
 
         if (focused.value) {
           roomEl!.style.background = "#8c8fd8";
+          focusedDevices.value = [];
 
           if (id === "bathroom") {
-            focusedDevices.value = [];
             focusedDevices.value = Object.values(deviceIds).filter((id: string) => id.includes("bathroom"));
           } else if (id === "kitchen") {
-            focusedDevices.value = [];
             focusedDevices.value = Object.values(deviceIds).filter((id: string) => id.includes("kitchen"));
           } else {
-            focusedDevices.value = [];
             focusedDevices.value = Object.values(deviceIds);
           }
-
-          console.log(focusedDevices.value);
         } else {
           roomEl!.style.background = "#A5A9FF";
         }
