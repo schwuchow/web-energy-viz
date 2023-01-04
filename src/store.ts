@@ -34,7 +34,7 @@ export const useDevicesStore = defineStore('devices', () => {
   ];
 
   const multimodal: Ref<boolean> = ref(false);
-  const calibration: Ref<boolean> = ref(true);
+  const calibration: Ref<boolean> = ref(false);
 
   const svgContent: Ref<HTMLElement & SVGElement> | Ref<null> = ref(null);
 

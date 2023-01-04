@@ -11,8 +11,7 @@ import { onMounted, ref, VNodeRef, Ref, watch } from 'vue';
 import apartmentImg from '../assets/apartment.svg';
 import { useDevicesStore } from '../store';
 import { storeToRefs } from 'pinia';
-import localforage from 'localforage';
-  
+
 export default {
   setup() {
     const store = useDevicesStore();
@@ -94,7 +93,9 @@ export default {
         // console.log(elapsedTime); //elapsed time is based on time since begin was called
         // console.log(xprediction, yprediction); //elapsed time is based on time since begin was called
         hasEyeFocus(xprediction, yprediction);
-      }).begin();
+      })
+      .saveDataAcrossSessions(true)
+      .begin();
 
       // console.log(localforage);
       // localforage.getItem('webgazerGlobalData').then(function(value) {

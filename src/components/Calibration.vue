@@ -25,7 +25,8 @@
     </div>
   </nav> -->
   <canvas id="plotting_canvas" width="500" height="500" style="cursor:crosshair;"></canvas>
-  <div class="calibration-dots">
+  <div>
+    <div class="calibration-dots">
       <input type="button" class="Calibration" id="Pt1" />
       <input type="button" class="Calibration" id="Pt2"/>
       <input type="button" class="Calibration" id="Pt3" />
@@ -35,33 +36,41 @@
       <input type="button" class="Calibration" id="Pt7" />
       <input type="button" class="Calibration" id="Pt8" />
       <input type="button" class="Calibration" id="Pt9" />
-  </div>
+    </div>
 
-  <div id="helpModal" class="modal fade" role="dialog">
-    <div class="modal-dialog">
+    <div id="helpModal" class="modal fade" role="dialog">
+      <div class="modal-dialog">
 
-      <!-- Modal content-->
-      <div class="modal-content">
-        <div class="modal-body">
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-body">
+          </div>
+          <div class="modal-footer">
+            <!-- <button id="closeBtn" type="button" class="btn btn-default" data-dismiss="modal">Close & load saved model </button> -->
+            <button type="button" id='start_calibration' class="btn btn-primary" @click="startCalibration">Calibrate</button>
+          </div>
         </div>
-        <div class="modal-footer">
-          <!-- <button id="closeBtn" type="button" class="btn btn-default" data-dismiss="modal">Close & load saved model </button> -->
-          <button type="button" id='start_calibration' class="btn btn-primary" @click="startCalibration">Calibrate</button>
-        </div>
+
       </div>
-
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { onMounted, ref } from 'vue';
+import { useDevicesStore } from '../store';
+import { storeToRefs } from 'pinia';
 
 export default {
   setup() {
+    const store = useDevicesStore();
+		const { calibration } = storeToRefs(store);
     var PointCalibrate = 0;
     var CalibrationPoints: any = {Pt1: 0, Pt2: 0, Pt3: 0, Pt4: 0, Pt5: 0, Pt6: 0, Pt7: 0, Pt8: 0, Pt9: 0};
     let showMiddlePoint = ref(false);
+
+    // saveDataAcrossSessions
+    // storingPoints
 
     onMounted(() => {
       console.log("MOUNTED");
@@ -101,38 +110,6 @@ export default {
       setup();
     };
 
-
-    // const addWebGazeListener = (): void => {
-    //   // @ts-ignore
-    //   let newWebgazer = webgazer.applyKalmanFilter(true);
-    //   // trackers: 'clmtrackr', 'js_objectdetect', 'trackingjs' -> but according to website & JS console only Mediapipe TFFacemesh valid tracker
-    //   // @ts-ignore
-    //   newWebgazer = webgazer.setTracker('TFFacemesh');
-    //   // regression models: ‘ridge’, ‘weightedRidge', 'threadedRidge' -> threadedRidge not working
-    //   // @ts-ignore
-    //   newWebgazer = webgazer.setRegression('weightedRidge');
-    //   // @ts-ignore
-    //   console.log(newWebgazer.getTracker());
-    //   console.log(newWebgazer.getRegression());
-
-    //   newWebgazer.setGazeListener(function(data: { x: any; y: any; }|null, elapsedTime: any) {
-    //     if (data == null) {
-    //         return;
-    //     }
-    //     let xprediction = data.x; //these x coordinates are relative to the viewport
-    //     let yprediction = data.y; //these y coordinates are relative to the viewport
-    //     // console.log(elapsedTime); //elapsed time is based on time since begin was called
-    //     // console.log(xprediction, yprediction); //elapsed time is based on time since begin was called
-    //     // hasEyeFocus(xprediction, yprediction);
-    //   }).begin();
-
-    //   // console.log(localforage);
-    //   // localforage.getItem('webgazerGlobalData').then(function(value) {
-    //   //   console.log(value);
-    //   // });
-    // };
-
-
     const startCalibration = () => {
       document.querySelectorAll(".Calibration").forEach(el => {
         el.addEventListener("click", saveClick);
@@ -164,7 +141,7 @@ export default {
         return new Promise(resolve => setTimeout(resolve, ms));  
       };
 
-      if (PointCalibrate >= 1) {
+      if (PointCalibrate >= 9) {
         store_points_variable(); // start storing the prediction points
 
         sleep(5000).then(() => {
@@ -175,8 +152,9 @@ export default {
           var accuracyLabel = "<a>Accuracy | "+precision_measurement+"%</a>";
           // document.getElementById("Accuracy")!.innerHTML = accuracyLabel;
           console.log(past50);
-          console.log(precision_measurement);
+          console.log("Accuracy: ", precision_measurement);
 
+          calibration.value = true;
         });
       }
     };
@@ -272,7 +250,7 @@ export default {
       return precision;
     }
 
-    return { startCalibration, showMiddlePoint, Restart };
+    return { startCalibration, showMiddlePoint, Restart, calibration };
   }
 }
 </script>
@@ -286,8 +264,8 @@ export default {
 }
 .calibration-dots {
   position: relative;
-  width: 1680px;
-  height: 581px;
+  width: 100vw;
+  height: 100vh;
 }
 .Calibration {
   border: 2px solid black;
@@ -300,7 +278,9 @@ export default {
 }
 
 #start_calibration {
-  // margin-bottom: 50px;
+  position: absolute;
+  top: 320px;
+  left: 130px;
 }
 
 #Pt1 {
