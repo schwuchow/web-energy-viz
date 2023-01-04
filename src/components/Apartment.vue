@@ -134,7 +134,7 @@ export default {
         const focused: Ref<boolean> = ref(false);
         const deviceEl: HTMLElement | null = (svgContent.value! as HTMLElement).querySelector(`g[id='${id}']`);
 
-        focused.value = calcFocus(xPred, yPred, device, 50);
+        focused.value = calcFocus(xPred, yPred, device, 20);
 
         if (focused.value) {
           deviceEl!.style.filter = "brightness(65%)";
@@ -156,19 +156,26 @@ export default {
         focused.value = calcFocus(xPred, yPred, room);
 
         if (focused.value) {
-          roomEl!.style.filter = "brightness(65%)";
-          focusedDevices.value.push(id);
+          roomEl!.style.background = "#8c8fd8";
+
+          if (id === "bathroom") {
+            focusedDevices.value = Object.values(deviceIds).filter((id: string) => id.includes("bathroom"));
+          } else if (id === "kitchen") {
+            focusedDevices.value = Object.values(deviceIds).filter((id: string) => id.includes("kitchen"));
+          } else {
+            focusedDevices.value = Object.values(deviceIds);
+          }
 
           console.log(focusedDevices.value);
         } else {
-          roomEl!.style.filter = "brightness(100%)";
+          roomEl!.style.background = "#A5A9FF";
         }
       })
     };
 
     const calcFocus = (xPred: number, yPred: number, el: any, range: number = 0) => {
       return xPred >= el.position.left - range && xPred <= el.position.right + range &&
-        yPred >= el.position.bottom - range  && yPred <= el.position.top + range;
+        yPred >= el.position.top - range  && yPred <= el.position.bottom + range;
     };
 
     return { apartmentImg, apartment };
