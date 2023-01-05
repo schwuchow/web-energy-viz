@@ -7,7 +7,7 @@ export const showHierarchicalBarChart = (data: any, date: string) => {
   resetVisualization();
 
   // set the dimensions and margins of the graph
-  var margin = {top: 50, right: 10, bottom: 150, left: 100},
+  var margin = {top: 50, right: 10, bottom: 150, left: 130},
       width = 370 - margin.left - margin.right,
       height = 450 - margin.top - margin.bottom;
 
@@ -251,7 +251,7 @@ export const showScatterPlotChart = (data: any, deviceIds: string[], date: strin
 
   resetVisualization();
 
-  const margin = {top: 60, right: 110, bottom: 60, left: 60},
+  const margin = {top: 60, right: 110, bottom: 60, left: 80},
   width = 380 - margin.left - margin.right,
   height = 400 - margin.top - margin.bottom;
 
@@ -303,7 +303,7 @@ export const showScatterPlotChart = (data: any, deviceIds: string[], date: strin
     .attr("text-anchor", "end")
     .attr("x", width + 40)
     .attr("y", height + 5)
-    .style("font-size", "11px")
+    .style("font-size", "9px")
     .style("font-weight", "bold")
     .text("Date");
 
@@ -311,15 +311,23 @@ export const showScatterPlotChart = (data: any, deviceIds: string[], date: strin
   const y = d3.scaleLinear()
     .domain( [minDomain, maxDomain])
     .range([ height, 0 ]);
-  svg.append("g")
-    .call(d3.axisLeft(y));
 
+  svg.append("g")
+  .call(d3.axisLeft(y)
+  .tickFormat(function (d: any) {
+    if (d > 1000000) {
+      return d / (1000 * 1000) + "M";
+    } else {
+      return d;
+    }
+  }));
+  
   // Add Y axis label:
   svg.append("text")
     .attr("text-anchor", "end")
     .attr("x", -margin.top + 70)
-    .attr("y", -margin.left + 50)
-    .style("font-size", "11px")
+    .attr("y", -margin.left + 70)
+    .style("font-size", "9px")
     .style("font-weight", "bold")
     .text("Power (kW)");
 
@@ -414,7 +422,7 @@ export const showSinglePointData = (data: any, date: string) => {
     .enter()
     .append("text")
       .style("fill", "#2E0B49")
-      .style("font-size", 24)
+      .style("font-size", 22)
       .style("font-weight", "bold")
       .attr("class", "device-text")
       .attr("transform", "translate(10,50)")

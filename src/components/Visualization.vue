@@ -93,7 +93,7 @@ export default {
               name: name,
               values: dataset.filter((d: any, index: number) => {
                 if (inTimeFrame(time, index)) return d;
-              }).map((d: any) => ({ Day: d.Day, Value: d[id], Date: createDate(time, parseInt(d.Day)) }))
+              }).map((d: any) => ({ Day: d.Day, Value: kiloWatt(d[id]), Date: createDate(time, parseInt(d.Day)) }))
             };
         });
 
