@@ -229,7 +229,13 @@ export const showRadialBarChart = (data: any, name: string) => {
       .style("font", "16px times")
       .style("fill", "#2E0B49")
       .attr("transform", "translate(-50, 0)")
-      .text(function(d: any) { return "Total: " + Math.round(total / 1000)  + " kW"});
+      .text(function(d: any) { 
+        if (total > 10000000) {
+          return "T: " + Math.round(total / (1000*1000*1000*1000))  + " Tr kW"
+        } else {
+          return "Total: " + Math.round(total / 1000)  + " kW"
+        }
+      });
 
   // Add the labels
   // svg.append("g")
@@ -366,6 +372,8 @@ export const showScatterPlotChart = (data: any, deviceIds: string[], date: strin
     .delay(function(d: any, i){ return (i * 50) });
 
   // Add a legend at the end of each line
+  let shiftTop = 0;
+
   svg
     .selectAll("myLabels")
     .data(sortedDateByDate)
@@ -377,6 +385,15 @@ export const showScatterPlotChart = (data: any, deviceIds: string[], date: strin
         // Put the text at the position of the last point
         .attr("transform", function(d) { return "translate(" + x(d.value.Date) + "," + y(d.value.Value) + ")"; })
         .attr("x", 12) // shift the text a bit more right
+        .attr("y", function(d: any) {
+          if (d.value.Value < 10000) {
+            const newPosY = -20 * shiftTop - 10;
+            shiftTop++;
+            return newPosY;
+          } else {
+            return -10;
+          }
+         }) // shift the text a bit more top
         .text(function(d) { return d.name; })
         .style("fill", function(d){ return colors(d.name) })
         .style("font-size", 10)
@@ -427,7 +444,13 @@ export const showSinglePointData = (data: any, date: string) => {
       .attr("class", "device-text")
       .attr("transform", "translate(10,50)")
       .attr("y", function(d: any, index: number) { return 40 * (index + 1) })
-      .text(function(d: any) { return `${d.name}: ${d.Value} kW` });
+      .text(function(d: any) {
+        if (d.Value > 1000000000) {
+          return `${d.name}: ${d.Value / (1000*1000*1000)} Tr kW`
+        } else {
+          return `${d.name}: ${d.Value} kW`
+        }
+      });
 }
 
 const resetVisualization = () => {
