@@ -1,6 +1,6 @@
 <template>
 <div class="apartment col-7">
-  <div class="apartment__focused-devices">
+  <div class="apartment__focused-devices" v-show="multimodal">
     <span class="apartment__focused-devices-label">Selected Devices:</span>
     <div v-for="focusedDevice in focusedDevicesObj"
          :key="focusedDevice"
@@ -43,17 +43,17 @@ export default {
 
       return list;
     });
-    let timer = 0;
+    // let timer = 0;
 
     onMounted(() => {
       console.log("MOUNTED");
 
-      if (multimodal) {
+      if (multimodal.value) {
         addWebGazeListener();
         setTimeout(() => buildDevicesMap(), 1000);
         buildRoomsMap();
       } else {
-        buildDevicesMap();
+        setTimeout(() => buildDevicesMap(), 1000);
       }
     })
 
@@ -96,7 +96,7 @@ export default {
       console.log(devices);
     };
 
-    if (multimodal) {
+    if (multimodal.value) {
       watch(focusedDevices, (value) => {
         if (value !== null && value.length > 0) setSelectedDevices(value);
         else {
@@ -148,7 +148,7 @@ export default {
 
         hasEyeFocusOnSelectedDevice(xprediction, yprediction);
 
-        timer += 1;
+        // timer += 1;
 
         // if (timer === 200) {
         //   console.log("TIMER RESET");
@@ -235,7 +235,7 @@ export default {
         yPred >= el.position.top - range  && yPred <= el.position.bottom + range;
     };
 
-    return { apartmentImg, apartment, focusedDevicesObj, focusedDevicesRef };
+    return { apartmentImg, apartment, focusedDevicesObj, focusedDevicesRef, multimodal };
   }
 }
 </script>

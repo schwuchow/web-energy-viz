@@ -42,7 +42,7 @@ export default {
         visualization.deviceIds.forEach(id => {
           const name = devices.value.get(id)?.name;
 
-          if (visualization.timePeriod === TimePeriod.LAST_MONTH) {
+          if (visualization.timePeriod === TimePeriod.LAST_MONTH || visualization.timePeriod === TimePeriod.LAST_WEEK) {
             const sum = calcSumOfConsumption(id);
             data.push({ sum, name });
           } else if (visualization.timePeriod === TimePeriod.TODAY || visualization.timePeriod === TimePeriod.YESTERDAY) {
