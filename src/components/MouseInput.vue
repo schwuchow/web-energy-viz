@@ -68,8 +68,8 @@ export default {
         devices.value.forEach((device: Device, id: string) => {
           const deviceEl = (svgContent.value! as HTMLElement).querySelector(`g[id='${id}']`);
 
-          if (deviceEl) deviceEl.addEventListener("mouseover", setFocus);
-          if (deviceEl) deviceEl.addEventListener("mouseout", setFocus);
+          // if (deviceEl) deviceEl.addEventListener("mouseover", setFocus);
+          // if (deviceEl) deviceEl.addEventListener("mouseout", setFocus);
         });
       };
     }
