@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, Ref } from 'vue';
-import {  Device, Visualization, CustomDate, Room } from './types/interfaces';
+import {  Device, Visualization, CustomDate, Room, FocusSelectedRooms } from './types/interfaces';
 
 export const useDevicesStore = defineStore('devices', () => {
   const deviceIds = {
@@ -17,24 +17,24 @@ export const useDevicesStore = defineStore('devices', () => {
   };
 
   const deviceNames: any = {
-    bathroomWashingMashine1: "Washing Machine 1",
-    bathroomWashingMashine2: "Washing Machine 2",
-    bathroomDryer1: "Dryer 1",
-    bathroomDryer2: "Dryer 2",
-    kitchenDishWasher1: "Dish Washer 1",
-    kitchenDishWasher2: "Dish Washer 2",
-    kitchenFridge1: "Fridge 1",
-    kitchenFridge2: "Fridge 2",
-    kitchenCoffeeMachine1: "Coffee Machine 1",
-    kitchenCoffeeMachine2: "Coffee Machine 2",
+    bathroomWashingMashine1: "Upper Washing Machine",
+    bathroomWashingMashine2: "Bottom Washing Machine",
+    bathroomDryer1: "Big Dryer",
+    bathroomDryer2: "Small Dryer",
+    kitchenDishWasher1: "Bottom Dish Washer",
+    kitchenDishWasher2: "Left Dish Washer",
+    kitchenFridge1: "Lower Fridge",
+    kitchenFridge2: "Upper Fridge",
+    kitchenCoffeeMachine1: "Left Coffee Machine",
+    kitchenCoffeeMachine2: "Right Coffee Machine",
   }
 
   const monthNames = ["January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
   ];
 
-  const multimodal: Ref<boolean> = ref(false);
-  const calibration: Ref<boolean> = ref(true);
+  const multimodal: Ref<boolean> = ref(true);
+  const calibration: Ref<boolean> = ref(false);
 
   const svgContent: Ref<HTMLElement & SVGElement> | Ref<null> = ref(null);
 
@@ -45,6 +45,23 @@ export const useDevicesStore = defineStore('devices', () => {
 
   const date: Ref<CustomDate> = ref({ day: 0, month: 0, year: 0});
   const focusedDevices: Ref<string[]> = ref([]);
+  const isSelectedThroughFocus: Ref<FocusSelectedRooms> = ref({ allRooms: false, kitchen: false, bathroom: false });
 
-  return { deviceIds, deviceValue, deviceNames, devices, visualization, svgContent, multimodal, monthNames, date, calibration, focusedDevices, rooms };
+  const speechBtnOnFocus: Ref<boolean> = ref(false);
+
+  return { deviceIds,
+           deviceValue,
+           deviceNames,
+           devices,
+           visualization,
+           svgContent,
+           multimodal,
+           monthNames,
+           date,
+           calibration,
+           focusedDevices,
+           rooms,
+           isSelectedThroughFocus,
+           speechBtnOnFocus,
+         };
 });

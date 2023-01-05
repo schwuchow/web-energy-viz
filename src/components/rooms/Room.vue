@@ -20,6 +20,7 @@
 import { ref, onMounted, VNodeRef, watch } from 'vue';
 import { useDevicesStore } from '../../store';
 import { storeToRefs } from 'pinia';
+import { FocusSelectedRooms } from '../../types/interfaces';
 
 export default {
   props: {
@@ -31,7 +32,7 @@ export default {
     const allDevices: VNodeRef | null = ref(null);
     const isSelected = ref(false);
     const store = useDevicesStore();
-		const { deviceValue } = storeToRefs(store);
+		const { deviceValue, isSelectedThroughFocus } = storeToRefs(store);
     const { deviceIds } = store;
     const id = props.title?.replace(" ", "-").toLowerCase();
 
@@ -44,6 +45,10 @@ export default {
 
     watch(isSelected, (value) => {
       setSelectedDevices(value);
+    });
+
+    watch(isSelectedThroughFocus.value, (value) => {
+      setSelectedDevicesThroughFocus(value);
     });
 
     const setSelectedDevices = (isSelected: boolean) => {
@@ -60,7 +65,15 @@ export default {
       }
     };
 
-    return { allDevices, isSelected, toggleSelected, id };
+    const setSelectedDevicesThroughFocus = (selectedObj: FocusSelectedRooms) => {
+      for (var k in selectedObj) {
+        if (k == "allRooms" && props.title === "All Rooms") isSelected.value = selectedObj[k as keyof FocusSelectedRooms];
+        else if (k === "kitchen" && props.title === "Kitchen") isSelected.value = selectedObj[k as keyof FocusSelectedRooms];
+        else if (k === "bathroom" && props.title === "Bathroom") isSelected.value = selectedObj[k as keyof FocusSelectedRooms];
+      }
+    }
+
+    return { allDevices, isSelected, toggleSelected, id, setSelectedDevicesThroughFocus };
   }
 }
 </script>

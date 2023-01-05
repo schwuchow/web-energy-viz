@@ -1,14 +1,14 @@
 <template>
 <div class="speech-input col-7">
 	<div class="speech-input__bar">
-		<button @click="toggleMic"><img :src="voiceWaveImg" id="speech-input__icon-wave" class="icon" /></button>
+		<button @click="toggleMic" class="speech-input__btn" ref="speechButton"><img :src="voiceWaveImg" id="speech-input__icon-wave" class="icon" /></button>
 		<div class="transcript" v-text="transcript"></div>
 	</div>
 </div>
 </template>
 
 <script lang="js">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import voiceWaveImg from '../assets/voice_wave.svg';
 import { TimePeriod } from '../types/enums';
 import { useDevicesStore } from '../store';
@@ -18,10 +18,11 @@ export default {
   setup() {
 		const store = useDevicesStore();
 		const { deviceIds } = store;
-		const { visualization } = storeToRefs(store);
-		const transcript = ref('Ask me something about your devices energy consumption!');
+		const { visualization, focusedDevices, speechBtnOnFocus } = storeToRefs(store);
 		const isRecording = ref(false);
-		const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+		const speechButton = ref(null);
+		const transcript = ref('Ask me something about your devices energy consumption!');
+		let Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 		const sr = new Recognition();
 		sr.lang = 'en-US';
 
@@ -31,10 +32,14 @@ export default {
 			sr.onstart = () => {
 				console.log('SR Started');
 				isRecording.value = true;
+				speechButton.value.style.borderColor = "red";
 			}
 			sr.onend = () => {
 				console.log('SR Stopped');
 				isRecording.value = false;
+				transcript.value = 'Ask me something about your devices energy consumption!';
+				speechButton.value.style.borderColor = "#2E0B49";
+				speechBtnOnFocus.value = false;
 			}
 			sr.onresult = (evt) => {
 				for (let i = 0; i < evt.results.length; i++) {
@@ -47,6 +52,12 @@ export default {
 					.join('');
 				
 				transcript.value = t;
+			}
+		});
+
+		watch(speechBtnOnFocus, (value) => {
+			if (value) {
+				sr.start();
 			}
 		});
 
@@ -67,11 +78,12 @@ export default {
 				} else {
 				var timePeriod = checkForTimePeriod(t);
 				var devicesSelected = checkForDevices(t);
-                var resultsRanked = false;
-                if (t.includes("ranked") || t.includes("ranking") || t.includes("order")){
-                    resultsRanked = true;
-                }
-                console.log(timePeriod, devicesSelected, resultsRanked);
+				var resultsRanked = false;
+
+				if (t.includes("ranked") || t.includes("ranking") || t.includes("order") || t.includes("range")){
+						resultsRanked = true;
+				}
+				console.log("Speech Input: ", timePeriod, devicesSelected, resultsRanked);
 
 				const newVisualization = {
 					timePeriod: timePeriod,
@@ -126,7 +138,14 @@ export default {
                 }
 			}
 			if (t.includes("washing machine")) {
+                if(t.includes("upper")){
 					devicesList.push(deviceIds.bathroomWashingMashine1);
+                }else if(t.includes("both machines") || t.includes("both washing machines")){
+                    devicesList.push(deviceIds.bathroomWashingMashine1);
+                    devicesList.push(deviceIds.bathroomWashingMashine2);
+                }else{
+                    devicesList.push(deviceIds.bathroomWashingMashine2);
+                }
 			}
 			if (t.includes("dryer")) {
                 if(t.includes("the small") || t.includes("smaller")){
@@ -159,11 +178,21 @@ export default {
                 }
 			}
             if (t.includes("coffee") || t.includes("coffee machine")) {
+                if( t.includes("left")){
 					devicesList.push(deviceIds.kitchenCoffeeMachine1);
+                }else if(t.includes("both coffe machines") || t.includes("both machines") || t.includes("machines")){
+                    devicesList.push(deviceIds.kitchenCoffeeMachine1);
+                    devicesList.push(deviceIds.kitchenCoffeeMachine2);
+                }else{
+                    devicesList.push(deviceIds.kitchenCoffeeMachine2);
+                }
 			}
 			
 			if (devicesList.length === 0) {
-			devicesList.push(0);
+                focusedDevices.value.forEach(device => {
+                devicesList.push(device);
+            });
+			
 			}
 
 			return devicesList;
@@ -172,13 +201,13 @@ export default {
         // the big and small dryer
         // the big and small washing machine
         // the upper fridge / the lower fridge
+    function checkForTimePeriod(t) {
+			var timePeriod = TimePeriod.TODAY;
 
-		function checkForTimePeriod(t) {
-            var timePeriod = TimePeriod.YESTERDAY;
 			if (t.includes("today")) {
-				timePeriod = TimePeriod.YESTERDAY;
+				timePeriod = TimePeriod.TODAY;
 			} else if (t.includes("yesterday")) {
-				timePeriod = TimePeriod.LAST_WEEK;
+				timePeriod = TimePeriod.YESTERDAY;
 			} else if (t.includes("last week") || t.includes("week")) {
 				timePeriod = TimePeriod.LAST_WEEK;
 			} else if (t.includes("last month")) {
@@ -187,7 +216,7 @@ export default {
 			return timePeriod;
 		}
 
-		return { voiceWaveImg, toggleMic, transcript };
+		return { voiceWaveImg, toggleMic, transcript, speechButton };
 	}
 }
 </script>
@@ -196,18 +225,18 @@ export default {
 .speech-input {
   grid-row: span 1;
   background-color: var(--color-light);
-  border-radius: 10px;
+  border-radius: 10px 10px 0 0;
 
   .speech-input__bar {
     height: 50px;
     margin: auto;
-    color: var(--color-secondary);
+    color: var(--color-primary);
     display: flex;
     align-items: center;
     font-size: 20px;
     background-color: var(--color-tertiary);
     margin: 30px 0;
-		padding: 10px 0 10px 50px;
+    padding: 10px 0 10px 50px;
 
     #speech-input__icon-wave {
       width: 25px;
@@ -215,6 +244,10 @@ export default {
       vertical-align: middle;
     }
   }
+
+	.speech-input__btn {
+		border-color: var(--color-primary);
+	}
 
 	.transcript {
 		padding-left: 20px;
