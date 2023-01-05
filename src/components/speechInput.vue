@@ -202,7 +202,7 @@ export default {
         // the big and small washing machine
         // the upper fridge / the lower fridge
     function checkForTimePeriod(t) {
-			var timePeriod = TimePeriod.YESTERDAY;
+			var timePeriod = TimePeriod.TODAY;
 
 			if (t.includes("today")) {
 				timePeriod = TimePeriod.TODAY;

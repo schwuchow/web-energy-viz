@@ -17,16 +17,16 @@ export const useDevicesStore = defineStore('devices', () => {
   };
 
   const deviceNames: any = {
-    bathroomWashingMashine1: "Washing Machine 1",
-    bathroomWashingMashine2: "Washing Machine 2",
-    bathroomDryer1: "Dryer 1",
-    bathroomDryer2: "Dryer 2",
-    kitchenDishWasher1: "Dish Washer 1",
-    kitchenDishWasher2: "Dish Washer 2",
-    kitchenFridge1: "Fridge 1",
-    kitchenFridge2: "Fridge 2",
-    kitchenCoffeeMachine1: "Coffee Machine 1",
-    kitchenCoffeeMachine2: "Coffee Machine 2",
+    bathroomWashingMashine1: "Upper Washing Machine",
+    bathroomWashingMashine2: "Bottom Washing Machine",
+    bathroomDryer1: "Big Dryer",
+    bathroomDryer2: "Small Dryer",
+    kitchenDishWasher1: "Bottom Dish Washer",
+    kitchenDishWasher2: "Left Dish Washer",
+    kitchenFridge1: "Lower Fridge",
+    kitchenFridge2: "Upper Fridge",
+    kitchenCoffeeMachine1: "Left Coffee Machine",
+    kitchenCoffeeMachine2: "Right Coffee Machine",
   }
 
   const monthNames = ["January", "February", "March", "April", "May", "June",
