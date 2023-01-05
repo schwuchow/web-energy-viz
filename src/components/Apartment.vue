@@ -2,12 +2,12 @@
 <div class="apartment col-7">
   <div class="apartment__focused-devices">
     <span class="apartment__focused-devices-label">Selected Devices:</span>
-    <div v-for="focusedDeviceName in focusedDevicesNames"
-         :key="focusedDeviceName"
+    <div v-for="focusedDevice in focusedDevicesObj"
+         :key="focusedDevice"
          class="apartment__focused-device-tag"
          ref="focusedDevicesRef"
-         :id="focusedDeviceName">
-      {{ focusedDeviceName }}
+         :id="focusedDevice.id">
+      {{ focusedDevice.name }}
     </div>
   </div>
   <div class="apartment__img-container">
@@ -21,16 +21,27 @@ import { onMounted, ref, VNodeRef, Ref, watch, computed } from 'vue';
 import apartmentImg from '../assets/apartment.svg';
 import { useDevicesStore } from '../store';
 import { storeToRefs } from 'pinia';
+import { FocusSelectedRooms } from '../types/interfaces';
 
 export default {
   setup() {
     const store = useDevicesStore();
-    const { devices, svgContent, deviceValue, multimodal, focusedDevices, rooms } = storeToRefs(store);
+    const { devices, svgContent, deviceValue, multimodal, focusedDevices, rooms, isSelectedThroughFocus } = storeToRefs(store);
     const { deviceIds, deviceNames } = store;
     const apartment: VNodeRef | null = ref(null);
     const focusedDevicesRef = ref([]);
-    const focusedDevicesNames = computed(() => {
-      return focusedDevices.value;
+    const focusedDevicesObj = computed(() => {
+      let list: any = [];
+      focusedDevices.value.forEach(deviceId => {
+        let newObj = {
+          id: deviceId + "-ref",
+          name: devices.value.get(deviceId)!.name,
+        };
+
+        list.push(newObj);
+      });
+
+      return list;
     });
     let timer = 0;
 
@@ -86,7 +97,7 @@ export default {
     };
 
     if (multimodal) {
-      watch(focusedDevicesNames, (value) => {
+      watch(focusedDevices, (value) => {
         if (value !== null && value.length > 0) setSelectedDevices(value);
         else {
           resetUnSelectedDevices(value);
@@ -180,30 +191,41 @@ export default {
           roomEl!.style.background = "#8c8fd8";
           focusedDevices.value = [];
 
+          Object.keys(isSelectedThroughFocus.value).forEach(key => {
+              isSelectedThroughFocus.value[key as keyof FocusSelectedRooms] = false ;
+          });
+
           if (id === "bathroom") {
+            isSelectedThroughFocus.value.bathroom = !isSelectedThroughFocus.value.bathroom;
             focusedDevices.value = Object.values(deviceIds).filter((id: string) => id.includes("bathroom"));
           } else if (id === "kitchen") {
+            isSelectedThroughFocus.value.kitchen = !isSelectedThroughFocus.value.kitchen;
             focusedDevices.value = Object.values(deviceIds).filter((id: string) => id.includes("kitchen"));
           } else {
+            isSelectedThroughFocus.value.allRooms = !isSelectedThroughFocus.value.allRooms;
             focusedDevices.value = Object.values(deviceIds);
           }
         } else {
           roomEl!.style.background = "#A5A9FF";
         }
+
+        if (isSelectedThroughFocus.value.bathroom && id === "bathroom") roomEl!.style.background = "#F7B634";
+        if (isSelectedThroughFocus.value.kitchen && id === "kitchen") roomEl!.style.background = "#F7B634";
+        if (isSelectedThroughFocus.value.allRooms && id === "all-rooms") roomEl!.style.background = "#F7B634";
       })
     };
 
     const hasEyeFocusOnSelectedDevice = (xPred: number, yPred: number) => {
-      focusedDevicesRef.value.forEach((focusedDevice) => {
+      focusedDevicesRef.value.forEach((focusedDevice: HTMLElement) => {
         const focused: Ref<boolean> = ref(false);
-        const tagDOMRect: DOMRect | undefined = (focusedDevice as HTMLElement).getBoundingClientRect();
+        const tagDOMRect: DOMRect | undefined = focusedDevice.getBoundingClientRect();
 
         focused.value = tagDOMRect !== undefined && xPred >= tagDOMRect.left && xPred <= tagDOMRect.right &&
         yPred >= tagDOMRect.top  && yPred <= tagDOMRect.bottom;
 
         if (focused.value) {
           console.log("FOCUSED TAG");
-          focusedDevices.value = focusedDevices.value.filter((id) => id !== (focusedDevice as HTMLElement).id);
+          focusedDevices.value = focusedDevices.value.filter((id) => id !== focusedDevice.id.replace("-ref", ""));
         }
       });
     };
@@ -213,7 +235,7 @@ export default {
         yPred >= el.position.top - range  && yPred <= el.position.bottom + range;
     };
 
-    return { apartmentImg, apartment, focusedDevicesNames, focusedDevicesRef };
+    return { apartmentImg, apartment, focusedDevicesObj, focusedDevicesRef };
   }
 }
 </script>

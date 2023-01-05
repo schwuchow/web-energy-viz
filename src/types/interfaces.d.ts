@@ -25,3 +25,9 @@ export interface CustomDate {
   month: number,
   year: number,
 }
+
+export interface FocusSelectedRooms {
+  allRooms: booleaen,
+  kitchen: boolean,
+  bathroom: boolean,
+}

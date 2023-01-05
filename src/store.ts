@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, Ref } from 'vue';
-import {  Device, Visualization, CustomDate, Room } from './types/interfaces';
+import {  Device, Visualization, CustomDate, Room, FocusSelectedRooms } from './types/interfaces';
 
 export const useDevicesStore = defineStore('devices', () => {
   const deviceIds = {
@@ -45,6 +45,20 @@ export const useDevicesStore = defineStore('devices', () => {
 
   const date: Ref<CustomDate> = ref({ day: 0, month: 0, year: 0});
   const focusedDevices: Ref<string[]> = ref([]);
+  const isSelectedThroughFocus: Ref<FocusSelectedRooms> = ref({ allRooms: false, kitchen: false, bathroom: false });
 
-  return { deviceIds, deviceValue, deviceNames, devices, visualization, svgContent, multimodal, monthNames, date, calibration, focusedDevices, rooms };
+  return { deviceIds,
+           deviceValue,
+           deviceNames,
+           devices,
+           visualization,
+           svgContent,
+           multimodal,
+           monthNames,
+           date,
+           calibration,
+           focusedDevices,
+           rooms,
+           isSelectedThroughFocus
+         };
 });
