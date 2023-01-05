@@ -30,6 +30,8 @@ export default {
     const { deviceIds, deviceNames } = store;
     const apartment: VNodeRef | null = ref(null);
     const focusedDevicesRef = ref([]);
+    const lookedAtDevice: Ref<string> = ref("");
+    const lookedAtRoom: Ref<string> = ref("");
     const focusedDevicesObj = computed(() => {
       let list: any = [];
       focusedDevices.value.forEach(deviceId => {
@@ -44,7 +46,9 @@ export default {
       return list;
     });
     let configuredWebGazer: any = null;
-    // let timer = 0;
+    let globalDevicesTimer = 0;
+    let timerDevice: Ref<number> = ref(0);
+    let timerRoom: Ref<number> = ref(0);
 
     onMounted(() => {
       console.log("MOUNTED");
@@ -110,8 +114,6 @@ export default {
 
         rooms.value.set((el as HTMLElement).id.replace("#", ""), newRoom);
       });
-
-      console.log(devices);
     };
 
     if (multimodal.value) {
@@ -168,13 +170,13 @@ export default {
 
         hasFocusOnSpeechButton(xprediction, yprediction);
 
-        // timer += 1;
+        globalDevicesTimer += 0.1;
 
-        // if (timer === 200) {
-        //   console.log("TIMER RESET");
-        //   timer = 0;
-        //   focusedDevices.value = [];
-        // }
+        if (globalDevicesTimer === 60) {
+          console.log("TIMER RESET");
+          globalDevicesTimer = 0;
+          focusedDevices.value = [];
+        }
       })
       .saveDataAcrossSessions(true)
       .begin();
@@ -188,10 +190,20 @@ export default {
         focused.value = calcFocus(xPred, yPred, device, 20);
 
         if (focused.value) {
-          deviceEl!.style.filter = "brightness(65%)";
 
-          const isFocusedDevice = focusedDevices.value.find(deviceId => deviceId === id);
-          if (!isFocusedDevice) focusedDevices.value.push(id);
+          if (lookedAtDevice.value === id) {
+            timerDevice.value += 0.1;
+            console.log("Device ", timerDevice.value);
+          } else {
+            lookedAtDevice.value = id;
+          }
+
+          if (timerDevice.value ! >= 0.5) {
+            deviceEl!.style.filter = "brightness(65%)";
+            const isFocusedDevice = focusedDevices.value.find(deviceId => deviceId === id);
+            if (!isFocusedDevice) focusedDevices.value.push(id);
+            timerDevice.value = 0;
+          }
         } else {
           const isFocusedDevice = focusedDevices.value.find(deviceId => deviceId === id);
 
@@ -209,21 +221,32 @@ export default {
 
         if (focused.value) {
           roomEl!.style.background = "#8c8fd8";
-          focusedDevices.value = [];
 
-          Object.keys(isSelectedThroughFocus.value).forEach(key => {
-              isSelectedThroughFocus.value[key as keyof FocusSelectedRooms] = false ;
-          });
-
-          if (id === "bathroom") {
-            isSelectedThroughFocus.value.bathroom = !isSelectedThroughFocus.value.bathroom;
-            focusedDevices.value = Object.values(deviceIds).filter((id: string) => id.includes("bathroom"));
-          } else if (id === "kitchen") {
-            isSelectedThroughFocus.value.kitchen = !isSelectedThroughFocus.value.kitchen;
-            focusedDevices.value = Object.values(deviceIds).filter((id: string) => id.includes("kitchen"));
+          if (lookedAtRoom.value === id) {
+            timerRoom.value += 0.1;
+            console.log("Room ", timerRoom.value);
           } else {
-            isSelectedThroughFocus.value.allRooms = !isSelectedThroughFocus.value.allRooms;
-            focusedDevices.value = Object.values(deviceIds);
+            lookedAtRoom.value = id;
+          }
+
+          if (timerRoom.value ! >= 3.0) {
+            focusedDevices.value = [];
+
+            Object.keys(isSelectedThroughFocus.value).forEach(key => {
+                isSelectedThroughFocus.value[key as keyof FocusSelectedRooms] = false ;
+            });
+
+            if (id === "bathroom") {
+              isSelectedThroughFocus.value.bathroom = !isSelectedThroughFocus.value.bathroom;
+              focusedDevices.value = Object.values(deviceIds).filter((id: string) => id.includes("bathroom"));
+            } else if (id === "kitchen") {
+              isSelectedThroughFocus.value.kitchen = !isSelectedThroughFocus.value.kitchen;
+              focusedDevices.value = Object.values(deviceIds).filter((id: string) => id.includes("kitchen"));
+            } else {
+              isSelectedThroughFocus.value.allRooms = !isSelectedThroughFocus.value.allRooms;
+              focusedDevices.value = Object.values(deviceIds);
+            }
+            timerRoom.value = 0;
           }
         } else {
           roomEl!.style.background = "#A5A9FF";
