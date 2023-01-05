@@ -1,7 +1,7 @@
 <template>
 <div class="speech-input col-7">
 	<div class="speech-input__bar">
-		<button @click="toggleMic"><img :src="voiceWaveImg" id="speech-input__icon-wave" class="icon" /></button>
+		<button @click="toggleMic" class="speech-input__btn"><img :src="voiceWaveImg" id="speech-input__icon-wave" class="icon" /></button>
 		<div class="transcript" v-text="transcript"></div>
 	</div>
 </div>
@@ -35,6 +35,7 @@ export default {
 			sr.onend = () => {
 				console.log('SR Stopped');
 				isRecording.value = false;
+				transcript.value = 'Ask me something about your devices energy consumption!';
 			}
 			sr.onresult = (evt) => {
 				for (let i = 0; i < evt.results.length; i++) {
@@ -176,11 +177,12 @@ export default {
         // the big and small washing machine
         // the upper fridge / the lower fridge
     function checkForTimePeriod(t) {
-            var timePeriod = TimePeriod.YESTERDAY;
+			var timePeriod = TimePeriod.YESTERDAY;
+
 			if (t.includes("today")) {
-				timePeriod = TimePeriod.YESTERDAY;
+				timePeriod = TimePeriod.TODAY;
 			} else if (t.includes("yesterday")) {
-				timePeriod = TimePeriod.LAST_WEEK;
+				timePeriod = TimePeriod.YESTERDAY;
 			} else if (t.includes("last week") || t.includes("week")) {
 				timePeriod = TimePeriod.LAST_WEEK;
 			} else if (t.includes("last month")) {
@@ -217,6 +219,10 @@ export default {
       vertical-align: middle;
     }
   }
+
+	.speech-input__btn {
+		border-color: var(--color-primary);
+	}
 
 	.transcript {
 		padding-left: 20px;
