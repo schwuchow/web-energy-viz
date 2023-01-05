@@ -82,7 +82,7 @@ export default {
 
 				if (t.includes("ranked") || t.includes("ranking") || t.includes("order") || t.includes("range")){
 						resultsRanked = true;
-				}
+					}
 				console.log("Speech Input: ", timePeriod, devicesSelected, resultsRanked);
 
 				const newVisualization = {
@@ -110,32 +110,32 @@ export default {
 
 		function checkForDevices(t) {
 			var devicesList = [];
-            const { devices } = storeToRefs(store)
-			if (t.includes("all") || t.includes("all devices") || t.includes("old devices")) {
-                if (t.includes("from the kitchen") || t.includes("kitchen")) {
-                devicesList.push(deviceIds.kitchenDishWasher1);
-                devicesList.push(deviceIds.kitchenDishWasher2);
-                devicesList.push(deviceIds.kitchenFridge1);
-                devicesList.push(deviceIds.kitchenFridge2);
-                devicesList.push(deviceIds.kitchenCoffeeMachine1);
-                devicesList.push(deviceIds.kitchenCoffeeMachine2);
-			    }else if (t.includes("bathroom") || t.includes("from the bathroom")) {
-                devicesList.push(deviceIds.bathroomWashingMashine1);
-                devicesList.push(deviceIds.bathroomWashingMashine2);
-                devicesList.push(deviceIds.bathroomDryer1);
-                devicesList.push(deviceIds.bathroomDryer2);
-			    }else{
-                devicesList.push(deviceIds.kitchenDishWasher1);
-                devicesList.push(deviceIds.kitchenDishWasher2);
-                devicesList.push(deviceIds.kitchenFridge1);
-                devicesList.push(deviceIds.kitchenFridge2);
-                devicesList.push(deviceIds.kitchenCoffeeMachine1);
-                devicesList.push(deviceIds.kitchenCoffeeMachine2);
-                devicesList.push(deviceIds.bathroomWashingMashine1);
-                devicesList.push(deviceIds.bathroomWashingMashine2);
-                devicesList.push(deviceIds.bathroomDryer1);
-                devicesList.push(deviceIds.bathroomDryer2);
-                }
+
+			if (t.match(/\ball\b/) || t.includes("all devices") || t.includes("old devices")) {
+				if (t.includes("from the kitchen") || t.includes("kitchen")) {
+					devicesList.push(deviceIds.kitchenDishWasher1);
+					devicesList.push(deviceIds.kitchenDishWasher2);
+					devicesList.push(deviceIds.kitchenFridge1);
+					devicesList.push(deviceIds.kitchenFridge2);
+					devicesList.push(deviceIds.kitchenCoffeeMachine1);
+					devicesList.push(deviceIds.kitchenCoffeeMachine2);
+				} else if (t.includes("bathroom") || t.includes("from the bathroom")) {
+					devicesList.push(deviceIds.bathroomWashingMashine1);
+					devicesList.push(deviceIds.bathroomWashingMashine2);
+					devicesList.push(deviceIds.bathroomDryer1);
+					devicesList.push(deviceIds.bathroomDryer2);
+			  } else {
+					devicesList.push(deviceIds.kitchenDishWasher1);
+					devicesList.push(deviceIds.kitchenDishWasher2);
+					devicesList.push(deviceIds.kitchenFridge1);
+					devicesList.push(deviceIds.kitchenFridge2);
+					devicesList.push(deviceIds.kitchenCoffeeMachine1);
+					devicesList.push(deviceIds.kitchenCoffeeMachine2);
+					devicesList.push(deviceIds.bathroomWashingMashine1);
+					devicesList.push(deviceIds.bathroomWashingMashine2);
+					devicesList.push(deviceIds.bathroomDryer1);
+					devicesList.push(deviceIds.bathroomDryer2);
+				}
 			}
 			if (t.includes("washing machine")) {
                 if(t.includes("upper")){
@@ -149,12 +149,12 @@ export default {
 			}
 			if (t.includes("dryer")) {
                 if(t.includes("the small") || t.includes("smaller")){
-                    devicesList.push(deviceIds.bathroomDryer2);
+                    devicesList.push(deviceIds.bathroomDryer1);
                 }else if(t.includes("both dryers")){
                     devicesList.push(deviceIds.bathroomDryer1);
                     devicesList.push(deviceIds.bathroomDryer2);
                 }else{
-                    devicesList.push(deviceIds.bathroomDryer1);
+                    devicesList.push(deviceIds.bathroomDryer2);
                 }
 			}
 			if (t.includes("dishwasher")) {

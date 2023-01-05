@@ -3,7 +3,7 @@
   <h2>Data Visualization</h2>
   <div class="visualization__container">
     <svg class="visualization__container-svg" width="370" height="400"></svg>
-    {{ visualization }}
+    <!-- {{ visualization }} -->
   </div>
 </div>
 </template>
