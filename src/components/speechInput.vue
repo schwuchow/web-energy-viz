@@ -1,14 +1,14 @@
 <template>
 <div class="speech-input col-7">
 	<div class="speech-input__bar">
-		<button @click="toggleMic" class="speech-input__btn"><img :src="voiceWaveImg" id="speech-input__icon-wave" class="icon" /></button>
+		<button @click="toggleMic" class="speech-input__btn" ref="speechButton"><img :src="voiceWaveImg" id="speech-input__icon-wave" class="icon" /></button>
 		<div class="transcript" v-text="transcript"></div>
 	</div>
 </div>
 </template>
 
 <script lang="js">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import voiceWaveImg from '../assets/voice_wave.svg';
 import { TimePeriod } from '../types/enums';
 import { useDevicesStore } from '../store';
@@ -18,10 +18,11 @@ export default {
   setup() {
 		const store = useDevicesStore();
 		const { deviceIds } = store;
-		const { visualization, focusedDevices } = storeToRefs(store);
-		const transcript = ref('Ask me something about your devices energy consumption!');
+		const { visualization, focusedDevices, speechBtnOnFocus } = storeToRefs(store);
 		const isRecording = ref(false);
-		const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+		const speechButton = ref(null);
+		const transcript = ref('Ask me something about your devices energy consumption!');
+		let Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 		const sr = new Recognition();
 		sr.lang = 'en-US';
 
@@ -31,11 +32,14 @@ export default {
 			sr.onstart = () => {
 				console.log('SR Started');
 				isRecording.value = true;
+				speechButton.value.style.borderColor = "red";
 			}
 			sr.onend = () => {
 				console.log('SR Stopped');
 				isRecording.value = false;
 				transcript.value = 'Ask me something about your devices energy consumption!';
+				speechButton.value.style.borderColor = "#2E0B49";
+				speechBtnOnFocus.value = false;
 			}
 			sr.onresult = (evt) => {
 				for (let i = 0; i < evt.results.length; i++) {
@@ -48,6 +52,12 @@ export default {
 					.join('');
 				
 				transcript.value = t;
+			}
+		});
+
+		watch(speechBtnOnFocus, (value) => {
+			if (value) {
+				sr.start();
 			}
 		});
 
@@ -68,11 +78,12 @@ export default {
 				} else {
 				var timePeriod = checkForTimePeriod(t);
 				var devicesSelected = checkForDevices(t);
-                var resultsRanked = false;
-                if (t.includes("ranked") || t.includes("ranking") || t.includes("order")){
-                    resultsRanked = true;
-                }
-                console.log(timePeriod, devicesSelected, resultsRanked);
+				var resultsRanked = false;
+
+				if (t.includes("ranked") || t.includes("ranking") || t.includes("order") || t.includes("range")){
+						resultsRanked = true;
+				}
+				console.log("Speech Input: ", timePeriod, devicesSelected, resultsRanked);
 
 				const newVisualization = {
 					timePeriod: timePeriod,
@@ -126,8 +137,9 @@ export default {
                 devicesList.push(deviceIds.bathroomDryer2);
                 }
 			}
-			if (t.includes("washing machine")) {
+			if (t.includes("both washing machines")) {
 					devicesList.push(deviceIds.bathroomWashingMashine1);
+					devicesList.push(deviceIds.bathroomWashingMashine2);
 			}
 			if (t.includes("dryer")) {
                 if(t.includes("the small") || t.includes("smaller")){
@@ -191,7 +203,7 @@ export default {
 			return timePeriod;
 		}
 
-		return { voiceWaveImg, toggleMic, transcript };
+		return { voiceWaveImg, toggleMic, transcript, speechButton };
 	}
 }
 </script>

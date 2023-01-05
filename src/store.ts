@@ -47,6 +47,8 @@ export const useDevicesStore = defineStore('devices', () => {
   const focusedDevices: Ref<string[]> = ref([]);
   const isSelectedThroughFocus: Ref<FocusSelectedRooms> = ref({ allRooms: false, kitchen: false, bathroom: false });
 
+  const speechBtnOnFocus: Ref<boolean> = ref(false);
+
   return { deviceIds,
            deviceValue,
            deviceNames,
@@ -59,6 +61,7 @@ export const useDevicesStore = defineStore('devices', () => {
            calibration,
            focusedDevices,
            rooms,
-           isSelectedThroughFocus
+           isSelectedThroughFocus,
+           speechBtnOnFocus,
          };
 });

@@ -26,7 +26,7 @@ import { FocusSelectedRooms } from '../types/interfaces';
 export default {
   setup() {
     const store = useDevicesStore();
-    const { devices, svgContent, deviceValue, multimodal, focusedDevices, rooms, isSelectedThroughFocus } = storeToRefs(store);
+    const { devices, svgContent, deviceValue, multimodal, focusedDevices, rooms, isSelectedThroughFocus, speechBtnOnFocus } = storeToRefs(store);
     const { deviceIds, deviceNames } = store;
     const apartment: VNodeRef | null = ref(null);
     const focusedDevicesRef = ref([]);
@@ -43,6 +43,7 @@ export default {
 
       return list;
     });
+    let configuredWebGazer: any = null;
     // let timer = 0;
 
     onMounted(() => {
@@ -52,10 +53,27 @@ export default {
         addWebGazeListener();
         setTimeout(() => buildDevicesMap(), 1000);
         buildRoomsMap();
+        setGazeListenerToStop();
       } else {
         setTimeout(() => buildDevicesMap(), 1000);
       }
     })
+
+    const setGazeListenerToStop = () => {
+      let paused = false;
+      document.addEventListener('keydown', function(event) {
+        if (event.code === 'Space') {
+          console.log(event.code);
+          if (paused) {
+            configuredWebGazer.resume();
+            paused = !paused;
+          } else {
+            configuredWebGazer.pause();
+            paused = !paused;
+          }
+        }
+      });
+    };
 
     const buildDevicesMap = (): void => {
       const svg = apartment.value;
@@ -129,7 +147,7 @@ export default {
 
     const addWebGazeListener = (): void => {
       // @ts-ignore
-      let configuredWebGazer = webgazer.applyKalmanFilter(true);
+      configuredWebGazer = webgazer.applyKalmanFilter(true);
       // trackers: 'clmtrackr', 'js_objectdetect', 'trackingjs' -> but according to website & JS console only Mediapipe TFFacemesh valid tracker
       // regression models: ‘ridge’, ‘weightedRidge', 'threadedRidge' -> threadedRidge not working
       // @ts-ignore
@@ -147,6 +165,8 @@ export default {
         hasEyeFocusOnRoom(xprediction, yprediction);
 
         hasEyeFocusOnSelectedDevice(xprediction, yprediction);
+
+        hasFocusOnSpeechButton(xprediction, yprediction);
 
         // timer += 1;
 
@@ -228,6 +248,20 @@ export default {
           focusedDevices.value = focusedDevices.value.filter((id) => id !== focusedDevice.id.replace("-ref", ""));
         }
       });
+    };
+
+    const hasFocusOnSpeechButton = (xPred: number, yPred: number) => {
+      const speechInput = document.querySelector("#speech-input__icon-wave");
+      const focused: Ref<boolean> = ref(false);
+      const speechInputDOMRect: DOMRect | undefined = speechInput!.getBoundingClientRect();
+      const range = 30;
+
+      focused.value = speechInputDOMRect !== undefined && xPred >= speechInputDOMRect.left - range && xPred <= speechInputDOMRect.right + range &&
+        yPred >= speechInputDOMRect.top - range  && yPred <= speechInputDOMRect.bottom + range;
+
+      if (focused.value) {
+        speechBtnOnFocus.value = true;
+      }
     };
 
     const calcFocus = (xPred: number, yPred: number, el: any, range: number = 0) => {
