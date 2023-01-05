@@ -137,9 +137,15 @@ export default {
                 devicesList.push(deviceIds.bathroomDryer2);
                 }
 			}
-			if (t.includes("both washing machines")) {
+			if (t.includes("washing machine")) {
+                if(t.includes("upper")){
 					devicesList.push(deviceIds.bathroomWashingMashine1);
-					devicesList.push(deviceIds.bathroomWashingMashine2);
+                }else if(t.includes("both machines") || t.includes("both washing machines")){
+                    devicesList.push(deviceIds.bathroomWashingMashine1);
+                    devicesList.push(deviceIds.bathroomWashingMashine2);
+                }else{
+                    devicesList.push(deviceIds.bathroomWashingMashine2);
+                }
 			}
 			if (t.includes("dryer")) {
                 if(t.includes("the small") || t.includes("smaller")){
@@ -172,7 +178,14 @@ export default {
                 }
 			}
             if (t.includes("coffee") || t.includes("coffee machine")) {
+                if( t.includes("left")){
 					devicesList.push(deviceIds.kitchenCoffeeMachine1);
+                }else if(t.includes("both coffe machines") || t.includes("both machines") || t.includes("machines")){
+                    devicesList.push(deviceIds.kitchenCoffeeMachine1);
+                    devicesList.push(deviceIds.kitchenCoffeeMachine2);
+                }else{
+                    devicesList.push(deviceIds.kitchenCoffeeMachine2);
+                }
 			}
 			
 			if (devicesList.length === 0) {
