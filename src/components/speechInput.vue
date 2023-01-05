@@ -160,6 +160,14 @@ export default {
                 }
 			}
             if (t.includes("coffee") || t.includes("coffee machine")) {
+                if( t.includes("left")){
+					devicesList.push(deviceIds.kitchenCoffeeMachine1);
+                }else if(t.includes("both coffe machines") || t.includes("both machines") || t.includes("machines")){
+                    devicesList.push(deviceIds.kitchenCoffeeMachine1);
+                    devicesList.push(deviceIds.kitchenCoffeeMachine2);
+                }else{
+                    devicesList.push(deviceIds.kitchenCoffeeMachine2);
+                }
 					devicesList.push(deviceIds.kitchenCoffeeMachine1);
 			}
 			
