@@ -6,7 +6,8 @@
          :key="focusedDevice"
          class="apartment__focused-device-tag"
          ref="focusedDevicesRef"
-         :id="focusedDevice.id">
+         :id="focusedDevice.id"
+         @click="deselectDevice">
       {{ focusedDevice.name }}
     </div>
   </div>
@@ -32,6 +33,7 @@ export default {
     const focusedDevicesRef = ref([]);
     const lookedAtDevice: Ref<string> = ref("");
     const lookedAtRoom: Ref<string> = ref("");
+    const lookedAtTag: Ref<string> = ref("");
     const focusedDevicesObj = computed(() => {
       let list: any = [];
       focusedDevices.value.forEach(deviceId => {
@@ -49,6 +51,7 @@ export default {
     let globalDevicesTimer = 0;
     let timerDevice: Ref<number> = ref(0);
     let timerRoom: Ref<number> = ref(0);
+    let timerTag: Ref<number> = ref(0);
 
     onMounted(() => {
       console.log("MOUNTED");
@@ -100,6 +103,11 @@ export default {
       });
 
       console.log(devices);
+    };
+
+    const deselectDevice = (ev: Event) => {
+      const el = ev.target as HTMLElement;
+      focusedDevices.value = focusedDevices.value.filter((id) => id !== el!.id.replace("-ref", ""));
     };
 
     const buildRoomsMap = (): void => {
@@ -172,11 +180,11 @@ export default {
 
         globalDevicesTimer += 0.1;
 
-        if (globalDevicesTimer === 60) {
-          console.log("TIMER RESET");
-          globalDevicesTimer = 0;
-          focusedDevices.value = [];
-        }
+        // if (globalDevicesTimer === 60) {
+        //   console.log("TIMER RESET");
+        //   globalDevicesTimer = 0;
+        //   focusedDevices.value = [];
+        // }
       })
       .saveDataAcrossSessions(true)
       .begin();
@@ -267,8 +275,18 @@ export default {
         yPred >= tagDOMRect.top  && yPred <= tagDOMRect.bottom;
 
         if (focused.value) {
-          console.log("FOCUSED TAG");
-          focusedDevices.value = focusedDevices.value.filter((id) => id !== focusedDevice.id.replace("-ref", ""));
+          if (lookedAtTag.value === focusedDevice.id) {
+            timerTag.value += 0.1;
+            console.log("Tag ", timerTag.value);
+          } else {
+            lookedAtTag.value = focusedDevice.id;
+          }
+          
+          if (timerTag.value ! >= 0.5) {
+            console.log("FOCUSED TAG");
+            focusedDevices.value = focusedDevices.value.filter((id) => id !== focusedDevice.id.replace("-ref", ""));
+            timerTag.value = 0;
+          }
         }
       });
     };
@@ -292,7 +310,7 @@ export default {
         yPred >= el.position.top - range  && yPred <= el.position.bottom + range;
     };
 
-    return { apartmentImg, apartment, focusedDevicesObj, focusedDevicesRef, multimodal };
+    return { apartmentImg, apartment, focusedDevicesObj, focusedDevicesRef, multimodal, deselectDevice };
   }
 }
 </script>
@@ -342,11 +360,16 @@ export default {
       padding: 5px 10px;
       margin-top: 10px;
       font-weight: bold;
+      cursor: pointer;
 
       &:after {
         content: 'X';
         padding-left: 5px;
         color: var(--color-light);
+      }
+
+      &:hover {
+        background-color: #1b062b;
       }
 
       & + .apartment__focused-device-tag {

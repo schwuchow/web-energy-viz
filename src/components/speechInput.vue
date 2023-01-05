@@ -248,6 +248,11 @@ export default {
 	.speech-input__btn {
 		border-color: var(--color-primary);
 		padding: 0.8em 1.6em;
+
+		&:focus-visible,
+		&:focus {
+			outline: none;
+		}
 	}
 
 	.transcript {
