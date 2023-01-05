@@ -149,7 +149,7 @@ export default {
 
 #start_calibration {
   position: absolute;
-  top: 320px;
+  top: 540px;
   left: 130px;
 }
 
@@ -197,13 +197,13 @@ export default {
 
 #Pt7 {
   position: absolute;
-  bottom: 40px;
   left: 0;
+  bottom: 280px;
 }
 
 #Pt8 {
   position: absolute;
-  top: 240px;
+  top: 0;
   left: 0;
 }
 
