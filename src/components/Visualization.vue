@@ -168,7 +168,7 @@ export default {
 
     const inTimeFrame = (timeObj: TimeFrame, index: number): boolean => {
         const { startDate, endDate } = timeObj;
-        return index >= startDate || index < endDate;
+        return index >= startDate && index < endDate;
     };
 
     const kiloWatt = (value: string) => {
